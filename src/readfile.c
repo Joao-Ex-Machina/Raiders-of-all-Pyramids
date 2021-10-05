@@ -30,20 +30,20 @@
 	while (feof(fp)==0){
 		readctrl = -1; //reset control and counter
 		readcnt = 0;
-		while (fgets(datastr,strlen(datastr),fp) != "\n"){
-			fscanf(fp, "%d %d %d %d %s ", &lines, &colummns, &targetcellline, &targetcelllcol, varID);
+		while (fgets(datastr,strlen(datastr),fp) != "\n"){ //unneeded while (?)
+			fscanf(fp, "%d %d %d %d %s", &lines, &colummns, &targetcellline, &targetcelllcol, varID);
 			if(strcmp(varID,"A6")==0) //check if variant A6 is active
-				fscanf(fp, "%d %d ", &targetcellline2, &targetcelllcol2);
-			fscanf(fp, "%d ", &readctrl)
-			matrix = matrixalloc(lines, colummns);
+				fscanf(fp, "%d %d", &targetcellline2, &targetcelllcol2,);
+			fscanf(fp, "%d", &readctrl)
+			matrix = matrixalloc(lines, colummns); //generate read matrix
 			while (readcnt<=reactrl){
-				fscanf(fp, "%d %d %d ", &cellline, &cellcol, &celldata);
+				fscanf(fp, "%d %d %d", &cellline, &cellcol, &celldata);
 				cellseed(matrix, cellline, cellcol, celldata);
 			}		
 		
 		}
-		variant_test(matrix, varID, targetcellline, targetcelllcol, targetcellline2, targetcelllcol2); //TBI
-		free_matrix(matrix, lines, colummns); //TBI
+		variant_test(matrix, targetcellline, targetcelllcol, targetcellline2, targetcelllcol2); //TBI
+		freematrix(matrix, lines, colummns);
 	}
-	fclose(_filenamein);
+
  }
