@@ -47,7 +47,7 @@
 			result=variant_test(matrix, targetcellline, targetcelllcol, targetcellline2, targetcelllcol2, varID, lines, colummns);
                 	fprintf(fpout,"%d\n\n",result);
 			freematrix(matrix, lines, colummns);
-			if(feof(fp)==0)
+			if(feof(fp)!=0)
 				break;
 		}
 	fclose(fp);
