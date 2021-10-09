@@ -50,7 +50,7 @@ int variant_test(int** matrix, int targetcellline, int targetcellcol, int target
 //started on 06 oct
 //revised 07 oct
 int check_neighbours (int** matrix, int targetcellline, int targetcellcol, int lines, int colummns, int colour){
-	int result=-3;
+	int result=0;
 	int* bounds;
 	if(targetcellline > (lines-1) || targetcellline < 0 || targetcellcol > (colummns-1) || targetcellcol < 0){
                 result=-2;
@@ -82,11 +82,11 @@ int check_neighbours (int** matrix, int targetcellline, int targetcellcol, int l
                                 result=1;
                 }
                 if(bounds[up]==0){
-                        if(matrix[targetcellline+1][targetcellcol]>0)
+                        if(matrix[targetcellline-1][targetcellcol]>0)
                                 result=1;
                 }
                 if(bounds[down]==0){
-                        if(matrix[targetcellline-1][targetcellcol]>0)
+                        if(matrix[targetcellline+1][targetcellcol]>0)
                                 result=1;
                 }
                 if(bounds[right]==0){
