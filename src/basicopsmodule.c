@@ -51,7 +51,7 @@ int variant_test(int** matrix, int targetcellline, int targetcellcol, int target
 //revised 07 oct
 int check_neighbours (int** matrix, int targetcellline, int targetcellcol, int lines, int colummns, int colour){
 	int result=0;
-	int* bounds;
+	int* bounds=0;
 	if(targetcellline > (lines-1) || targetcellline < 0 || targetcellcol > (colummns-1) || targetcellcol < 0){
                 result=-2;
 		return result;
@@ -95,6 +95,7 @@ int check_neighbours (int** matrix, int targetcellline, int targetcellcol, int l
                 }
         
 	}
+	free(bounds);
 	return result;
 }
  //07 oct
@@ -126,12 +127,12 @@ int check_breakability(int** matrix, int targetcellline, int targetcellcol, int 
                 }
 
         }
-
+	free(bounds);
 	return result;
 }
 //07 oct
 int* check_bounds(int targetcellline, int targetcellcol, int lines, int colummns){
-	static int bounds [4]={0,0,0,0};//left,up,down,right
+	int* bounds=(int*)calloc(4, sizeof(int));
 	if(targetcellcol==0)
 		bounds[left]=1; //macro implemented
 	if (targetcellline==0)

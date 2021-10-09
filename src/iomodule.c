@@ -50,6 +50,7 @@
                 	fprintf(fpout,"%d\n\n",result);
 			freematrix(matrix, lines, colummns);
 		}
+	freematrix(matrix,lines,colummns);
 	fclose(fp);
 	fclose(fpout);
 	free (_filenameout);
@@ -58,12 +59,13 @@
 //08 Oct
 char* gen_outname(char* _filenamein){
 	int lenght=strlen(_filenamein);
-	char* _filenameout=(char*)malloc((sizeof(char)*lenght)+1);
+	char* _filenameout=(char*)malloc((sizeof(char)*lenght)+2);
 	strcpy(_filenameout, _filenamein);
 	_filenameout[lenght-3]='s';
 	_filenameout[lenght-2]='o';
 	_filenameout[lenght-1]='l';
 	_filenameout[lenght]='1';
+	_filenameout[lenght+1]='\0';
 	return _filenameout;
 }
 //08 Oct
