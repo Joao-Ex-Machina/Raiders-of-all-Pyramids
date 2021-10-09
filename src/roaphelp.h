@@ -8,6 +8,9 @@
 | Date: 08 October 2021                                                                                |
 +-----------------------------------------------------------------------------------------------------*/
 #ifndef ROAPHELP_H_INCLUDED
+//dependencies
+#include <stdio.h>
+#include <stdlib.h>
 //Macro definitions
 #define User_Called_Help 0
 #define Argument_Error 1
@@ -18,6 +21,7 @@
 #define File_Not_Found '0'
 #define Unsupported_Extension 'A'
 #define Unknown_Operation 'B'
+#define HELP_MESSAGE "USER CALLED HELP\n VALID INPUTS:\n -h Displays this message \n -s [filename.in1]: Runs alpha version tests based on inserted file"
 //Function definition
 void help(int Primary_ErrorCode,char Secondary_ErrorCode);
 #define ROAPHELP_H_INCLUDED

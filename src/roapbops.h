@@ -14,7 +14,9 @@
 #define up 1
 #define down 2
 #define right 3
-
+#define white 0
+#define black -1
+#define grey 1
 
 int variant_test(int** matrix, int targetcellline, int targetcellcol, int targetcellline2, int targetcellcol2, char varID[2], int lines, int colummns);
 int check_neighbours (int** matrix, int targetcelllline, int targetcellcol, int lines, int columns, int colour);

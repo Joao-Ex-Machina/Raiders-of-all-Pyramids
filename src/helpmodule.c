@@ -18,7 +18,7 @@
 */
 void help(int Primary_ErrorCode,char Secondary_ErrorCode){
     if (Primary_ErrorCode !=0)
-        perror("Error type %d%c \n", Primary_ErrorCode, Secondary_ErrorCode);
+        printf("Error type %d%c \n", Primary_ErrorCode, Secondary_ErrorCode);
     switch (Primary_ErrorCode){
         case 0:
             printf(HELP_MESSAGE); //user called help
@@ -52,9 +52,9 @@ void help(int Primary_ErrorCode,char Secondary_ErrorCode){
                     	perror(" Unsupported Extension on File");
                     	exit(201);
                     	break;
-		case 'B'
+		case 'B':
 		     	perror("Unknown operation on File");
-			exit(202)
+			exit(202);
 			break;
             }
         break;

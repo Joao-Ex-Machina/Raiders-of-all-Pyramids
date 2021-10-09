@@ -1,20 +1,17 @@
 /*-----------------------------------------------------------------------------------------------------+
-| roapio.h               |Library for the Read/Write module (iomodule.c), containing dependencies,     |
-|                        |read/write and auxiliary functions definitions and macros used.              |
+| roapmatrix.h           |Function Definitions for matrixmodule.c                                      |
+|                        |                                                                             |
 |                        |                                                                             |
 +------------------------------------------------------------------------------------------------------+
 | Authors: Joao Barreiros C. Rodrigues nº99968, Henrique Ramos Delfino nº99957                         |
 |          LEEC-IST                                                                                    |
-| Date: 08 October 2021                                                                                |
+| Date: 05 October 2021                                                                                |
 +-----------------------------------------------------------------------------------------------------*/
-#ifndef ROAPIO_H_INCLUDED
-#define ROAPIO_H_INCLUDED
+#ifndef ROAPMATRIX_H_INCLUDED
+#define ROAPMATRIX_H_INCLUDED
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-void readwritefile(char*_filenamein, int sflag);
-char* gen_outname(char* _filenamein);
-void check_inname(char* _filenamein,int sflag);
+int** matrixalloc(int lines, int colummns);
+void cellseed(int**matrix, int cellline, int cellcol, int celldata);
+void freematrix (int** matrix, int lines, int colummns);
 #endif
-

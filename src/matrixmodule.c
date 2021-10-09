@@ -7,8 +7,8 @@
 |          MEEC-IST                                                                                    |
 | Date: 04 October 2021                                                                                |
 +-----------------------------------------------------------------------------------------------------*/
+#include "roapmatrix.h"
 
-#include <roap.h>
 /*Function Name: matrixalloc
   Input: 2 integers (number of collumns and lines)
   Output: pointer to pointer to int
@@ -19,14 +19,15 @@
 */
 int** matrixalloc(int lines, int colummns){
 	int** matrix = NULL;
-	int aux = 0, aux2 =0;
-	matrix = (int**)calloc(lines,sizeof(int)); //alloc and init number of lines (number of pointers to pointers)
-	for(aux=0; aux < lines; aux++)
-		matrix[aux]=(int*)calloc(colummns,sizeof(int)); //alloc and init number of colummns (number of pointers)
-	for(aux=0; aux < lines ; aux++){
-		for(aux2=0; aux<colummns; aux++)
+	int aux = 0/*, aux2 =0*/;
+	matrix = (int**)calloc(lines,sizeof(int*)); //alloc and init number of lines (number of pointers to pointers)
+	for(aux=0; aux < lines; aux++){
+		matrix[aux]=(int*)calloc(colummns,sizeof(int));
+	} //alloc and init number of colummns (number of pointers)
+	/*for(aux=0; aux < lines ; aux++){
+		for(aux2=0; aux2<colummns; aux2++)
 			matrix[aux][aux2] = 0; //initialize all matrix cells at 0 
-	}
+	}*/
 	return matrix;
 }
 /*Function Name: cellseed
@@ -48,9 +49,9 @@ int** matrixalloc(int lines, int colummns){
   Last Revised:
   Definition: free allocated matrix completly
 */
-void freematrix (int** matrix, int lines, colummns){
+void freematrix (int** matrix, int lines, int colummns){
 	int aux = 0;
-	for(aux=0; aux < lines; aux ++ ){
+	for(aux=0; aux < lines; aux++){ 
 		free(matrix[aux]);
 	}
 	free(matrix);

@@ -7,7 +7,7 @@
 |          LEEC-IST                                                                                    |
 | Date: 05 October 2021                                                                                |
 +-----------------------------------------------------------------------------------------------------*/
-#include <roapbops.h>
+#include "roapbops.h"
 #include "roaphelp.h"
 // START 05 Out Im going to sleep
 // revised on 07 oct
@@ -18,7 +18,6 @@ int variant_test(int** matrix, int targetcellline, int targetcellcol, int target
 	targetcellline2 -=1;
 	targetcellcol2 -=1;
 	int result = -3;
-	int extractedID=0;
 	if(varID[0]!='A')
 		help(Read_Error, Unknown_Operation); //TBI
 	switch(varID[1]){
@@ -39,67 +38,68 @@ int variant_test(int** matrix, int targetcellline, int targetcellcol, int target
 			result=check_neighbours(matrix, targetcellline, targetcellcol, lines, colummns, black);
 		break;
 		case '5':
-			result=check_breakability;
+			result=check_breakability(matrix, targetcellline, targetcellcol, lines, colummns);
 		break;
 		case '6':
 			//TBI
 		break;
 	}
 	return result;
-}int** matrix, int targetcelllline, int targetcellcol, int lines, int columns
+}
 
 //started on 06 oct
 //revised 07 oct
-int check_neighbours (int** matrix, int targetcelllline, int targetcellcol, int lines, int columns, int colour){
-	int bounds[4]={0,0,0,0};
+int check_neighbours (int** matrix, int targetcellline, int targetcellcol, int lines, int colummns, int colour){
+	int result=-3;
+	int* bounds;
 	if(targetcellline > (lines-1) || targetcellline < 0 || targetcellcol > (colummns-1) || targetcellcol < 0){
                 result=-2;
 		return result;
 	}
 	bounds=check_bounds(targetcellline, targetcellcol,lines, colummns);
 	if(colour==white||colour==black){
-		if(bound[left]==0){
+		if(bounds[left]==0){
 			if(matrix[targetcellline][targetcellcol-1]==colour)
 				result=1;
 		}
-		if(bound[up]==0){
+		if(bounds[up]==0){
 			if(matrix[targetcellline+1][targetcellcol]==colour)
                                 result=1;
 		}
-		if(bound[down]==0){
+		if(bounds[down]==0){
 			if(matrix[targetcellline-1][targetcellcol]==colour)
                                 result=1;
 		}
-		if(bound[right]==0){
+		if(bounds[right]==0){
 			if(matrix[targetcellline][targetcellcol+1]==colour)
                                 result=1;
 		}
                         
        	}
        	else{ //grey cell search
-		if(bound[left]==0){
+		if(bounds[left]==0){
                         if(matrix[targetcellline][targetcellcol-1]>0)
                                 result=1;
                 }
-                if(bound[up]==0){
+                if(bounds[up]==0){
                         if(matrix[targetcellline+1][targetcellcol]>0)
                                 result=1;
                 }
-                if(bound[down]==0){
+                if(bounds[down]==0){
                         if(matrix[targetcellline-1][targetcellcol]>0)
                                 result=1;
                 }
-                if(bound[right]==0){
+                if(bounds[right]==0){
                         if(matrix[targetcellline][targetcellcol+1]>0)
                                 result=1;
                 }
         
 	}
-
+	return result;
 }
  //07 oct
-int check_breakability(int** matrix, int targetcelllline, int targetcellcol, int lines, int columns){
-	int bounds[4]={0,0,0,0};
+int check_breakability(int** matrix, int targetcellline, int targetcellcol, int lines, int colummns){
+	int* bounds=0;
 	int result=0;
         if(targetcellline > (lines-1) || targetcellline < 0 || targetcellcol > (colummns-1) || targetcellcol < 0){
                 result=-2;
@@ -125,12 +125,13 @@ int check_breakability(int** matrix, int targetcelllline, int targetcellcol, int
                 }
 
         }
+
 	return result;
 }
 //07 oct
 int* check_bounds(int targetcellline, int targetcellcol, int lines, int colummns){
-	int bounds[4]={0,0,0,0};//left,up,down,right
-	if(targetcellcol==0)
+	static int bounds [4]={0,0,0,0};//left,up,down,right
+	if(targetcellcol==4)
 		bounds[left]=1; //macro implemented
 	if (targetcellline==0)
 		bounds[up]=1;
