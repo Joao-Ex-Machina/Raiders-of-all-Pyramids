@@ -108,6 +108,7 @@ int check_breakability(int** matrix, int targetcellline, int targetcellcol, int 
 
         bounds=check_bounds(targetcellline, targetcellcol,lines, colummns);
 	if(matrix[targetcellline][targetcellcol]<=white){ //check if cell is grey
+		result=-1;
 		return result;
 	}
 
