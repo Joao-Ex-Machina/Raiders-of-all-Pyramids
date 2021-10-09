@@ -34,8 +34,6 @@
 	while (feof(fp)==0){
 		readctrl = -1; //reset control and counter
 		readcnt = 0;
-			if(feof(fp)!=0)
-				break;
 			fscanf(fp, "%d %d %d %d %s", &lines, &colummns, &targetcellline, &targetcelllcol, varID);
 			if(strcmp(varID,"A6")==0) //check if variant A6 is active
 				fscanf(fp, "%d %d", &targetcellline2, &targetcelllcol2);
@@ -46,6 +44,8 @@
 				cellseed(matrix, cellline, cellcol, celldata);
 				readcnt++;
 			}
+			if(feof(fp)!=0)
+				break;
 			result=variant_test(matrix, targetcellline, targetcelllcol, targetcellline2, targetcelllcol2, varID, lines, colummns);
                 	fprintf(fpout,"%d\n\n",result);
 			freematrix(matrix, lines, colummns);
