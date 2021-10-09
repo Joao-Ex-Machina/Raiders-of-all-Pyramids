@@ -63,11 +63,11 @@ int check_neighbours (int** matrix, int targetcellline, int targetcellcol, int l
 				result=1;
 		}
 		if(bounds[up]==0){
-			if(matrix[targetcellline+1][targetcellcol]==colour)
+			if(matrix[targetcellline-1][targetcellcol]==colour)
                                 result=1;
 		}
 		if(bounds[down]==0){
-			if(matrix[targetcellline-1][targetcellcol]==colour)
+			if(matrix[targetcellline+1][targetcellcol]==colour)
                                 result=1;
 		}
 		if(bounds[right]==0){
@@ -131,7 +131,7 @@ int check_breakability(int** matrix, int targetcellline, int targetcellcol, int 
 //07 oct
 int* check_bounds(int targetcellline, int targetcellcol, int lines, int colummns){
 	static int bounds [4]={0,0,0,0};//left,up,down,right
-	if(targetcellcol==4)
+	if(targetcellcol==0)
 		bounds[left]=1; //macro implemented
 	if (targetcellline==0)
 		bounds[up]=1;
