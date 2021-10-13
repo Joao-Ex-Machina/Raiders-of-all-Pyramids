@@ -1,5 +1,5 @@
 /*-----------------------------------------------------------------------------------------------------+
-| basicopsmodule.c       |1st phase operative non-pathfinding operations for roapmain.c                |
+| basicopsmodule.c       |1st phase operative operations modules for roapmain.c                        |
 |                        |                                                                             |
 |                        |                                                                             |
 +------------------------------------------------------------------------------------------------------+
@@ -110,12 +110,14 @@ int check_breakability(int** matrix, int targetcellline, int targetcellcol, int 
         bounds=check_bounds(targetcellline, targetcellcol,lines, colummns);
 	if(matrix[targetcellline][targetcellcol]<=white){ //check if cell is grey
 		result=-1;
+		free(bounds);
 		return result;
 	}
 
 	if(bounds[left]==0 && bounds[right]==0){ //Verify if there's any bound. In positive case discard that path
 		if(matrix[targetcellline][targetcellcol-1]==0 && matrix[targetcellline][targetcellcol+1]==0){
 			result=1;
+			free(bounds);
 			return result;
 		}
 
@@ -123,6 +125,7 @@ int check_breakability(int** matrix, int targetcellline, int targetcellcol, int 
 	if(bounds[up]==0 && bounds[down]==0){
                 if(matrix[targetcellline-1][targetcellcol]==0 && matrix[targetcellline+1][targetcellcol]==0){
                         result=1;
+			free(bounds);
 			return result;
                 }
 
@@ -147,28 +150,28 @@ int* check_bounds(int targetcellline, int targetcellcol, int lines, int colummns
 int flood_room(int** matrix, int targetcellline, int targetcellcol,int targetcellline2, int targetcellcol2, int lines, int colummns, int firstflag ){
 	int result=0;
 	if(firstflag==1){
-		if(targetcellline < 0 ||targetcellline2 < 0 || targetcellline > lines || targetcellline2 > lines || targetcellcol < 0 ||targetcellcol2 < 0 || targetcellcol > colummns || targetcellcol2 > colummns){
+		if(targetcellline < 0 ||targetcellline2 < 0 || targetcellline >(lines-1) || targetcellline2 > (lines-1) || targetcellcol < 0 ||targetcellcol2 < 0 || targetcellcol >(colummns-1) || targetcellcol2 > (colummns-1)){
 			result =-2;
 			return result;
 		}
 	}
 	if(firstflag==0){
-                if(targetcellline < 0 ||targetcellline2 < 0 || targetcellline > lines || targetcellline2 > lines || targetcellcol < 0 ||targetcellcol2 < 0 || targetcellcol > colummns || targetcellcol2 > colummns)
+                if(targetcellline < 0 ||targetcellline2 < 0 || targetcellline > (lines-1) || targetcellline2 > (lines-1) || targetcellcol < 0 ||targetcellcol2 < 0 || targetcellcol > (colummns-1) || targetcellcol2 > (colummns-1))
                 return 0;
         }
-	if(matrix[targetcellline2][targetcellcol2]==path){
+	if(matrix[targetcellline2][targetcellcol2]==path){ //no need to continue path-finding
         	result =1;
 		return result;
 	}
 	if(matrix[targetcellline][targetcellcol]==white){
 		matrix[targetcellline][targetcellcol]=path;
-		if(targetcellline < lines) //used in order to reduced memory allocated by check_bounds
+		if(targetcellline < (lines-1)) //used in order to reduced memory allocated by check_bounds
 			flood_room(matrix,targetcellline+1,targetcellcol, targetcellline2, targetcellcol2, lines,colummns, 0);
-		if(targetcellline > 0)
+		if(targetcellline > 1)
 			flood_room(matrix,targetcellline-1,targetcellcol, targetcellline2, targetcellcol2, lines,colummns, 0);
-		if(targetcellcol < colummns)
+		if(targetcellcol < (colummns-1))
 			flood_room(matrix,targetcellline,targetcellcol+1, targetcellline2, targetcellcol2, lines,colummns, 0);
-		if(targetcellcol >0)
+		if(targetcellcol > 1)
 			flood_room(matrix,targetcellline,targetcellcol-1, targetcellline2, targetcellcol2, lines,colummns, 0);
 	}
 	else
