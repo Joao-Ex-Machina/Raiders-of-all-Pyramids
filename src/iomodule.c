@@ -17,7 +17,7 @@
   Input: Pointer to char (name of the file to be read)
   Output: pointer to pointer to int (matrix)
   Date Created: 05 Oct 2021
-  Last Revised: 09 Oct 2021
+  Last Revised: 13 Oct 2021
   Definition:
 */
  void readwritefile(char*_filenamein, int sflag){
@@ -41,7 +41,7 @@
 			matrix = matrixalloc(lines, colummns); //generate read matrix
 			while (readcnt<readctrl){
 				fscanf(fp, "%d %d %d", &cellline, &cellcol, &celldata);
-				cellseed(matrix, cellline, cellcol, celldata);
+				cellseed(matrix, cellline, cellcol, celldata, lines, colummns);
 				readcnt++;
 			}
 			if(feof(fp)!=0)

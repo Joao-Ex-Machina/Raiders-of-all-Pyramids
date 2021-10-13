@@ -12,6 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 int** matrixalloc(int lines, int colummns);
-void cellseed(int**matrix, int cellline, int cellcol, int celldata);
+void cellseed(int**matrix, int cellline, int cellcol, int celldata, int lines, int colummns);
 void freematrix (int** matrix, int lines, int colummns);
 #endif

@@ -41,7 +41,7 @@ int variant_test(int** matrix, int targetcellline, int targetcellcol, int target
 			result=check_breakability(matrix, targetcellline, targetcellcol, lines, colummns);
 		break;
 		case '6':
-			//TBI
+			result=flood_room(matrix,targetcellline,targetcellcol, targetcellline2, targetcellcol2, lines,colummns, 1);
 		break;
 	}
 	return result;
@@ -142,4 +142,37 @@ int* check_bounds(int targetcellline, int targetcellcol, int lines, int colummns
 	if (targetcellcol==(colummns-1))
 		bounds[right]=1;
 	return bounds;
+}
+//12 Oct
+int flood_room(int** matrix, int targetcellline, int targetcellcol,int targetcellline2, int targetcellcol2, int lines, int colummns, int firstflag ){
+	int result=0;
+	if(firstflag==1){
+		if(targetcellline < 0 ||targetcellline2 < 0 || targetcellline > lines || targetcellline2 > lines || targetcellcol < 0 ||targetcellcol2 < 0 || targetcellcol > colummns || targetcellcol2 > colummns)
+		result =-2;
+		return result;
+	}
+	if(firstflag==0){
+                if(targetcellline < 0 ||targetcellline2 < 0 || targetcellline > lines || targetcellline2 > lines || targetcellcol < 0 ||targetcellcol2 < 0 || targetcellcol > colummns || targetcellcol2 > colummns)
+                return 1;
+        }
+	if(matrix[targetcellline][targetcellcol]==white){
+
+		matrix[targetcellline][targetcellcol]=path;
+		if(targetcellline < lines) //used in order to reduced memory allocated by check_bounds
+			flood_room(matrix,targetcellline+1,targetcellcol, targetcellline2, targetcellcol2, lines,colummns, 0);
+		if(targetcellline > 0)
+			flood_room(matrix,targetcellline-1,targetcellcol, targetcellline2, targetcellcol2, lines,colummns, 0);
+		if(targetcellcol < colummns)
+			flood_room(matrix,targetcellline,targetcellcol+1, targetcellline2, targetcellcol2, lines,colummns, 0);
+		if(targetcellcol >0)
+			flood_room(matrix,targetcellline,targetcellcol-1, targetcellline2, targetcellcol2, lines,colummns, 0);
+	}
+	else
+		return 0;
+	if(firstflag==1) {		//confirm we are back to the first instance of the function
+		if(matrix[targetcellline2][targetcellcol2]==path)
+			result =1;	
+		return result;
+	}
+	return result;
 }

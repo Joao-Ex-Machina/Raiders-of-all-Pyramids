@@ -13,7 +13,7 @@
   Input: An integer and a char corresponding to the error code
   Output: No return.
   Date Created: 09 Oct 2021
-  Last Revised: 09 Oct 2021
+  Last Revised: 13 Oct 2021
   Definition: Help manager function. Note that programs are aborted with diferent exit codes for easier compreension
 */
 void help(int Primary_ErrorCode,char Secondary_ErrorCode){
@@ -55,6 +55,10 @@ void help(int Primary_ErrorCode,char Secondary_ErrorCode){
 		case 'B':
 		     	perror("Unknown operation on File");
 			exit(202);
+			break;
+		case 'C':
+			perror("Incoherent Information on file. Trying to acess non-existing cell. Please correct file before inputing again");
+			exit(203);
 			break;
             }
         break;

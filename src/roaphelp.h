@@ -21,6 +21,7 @@
 #define File_Not_Found '0'
 #define Unsupported_Extension 'A'
 #define Unknown_Operation 'B'
+#define Bad_Info 'C'
 #define HELP_MESSAGE "USER CALLED HELP\n VALID INPUTS:\n -h Displays this message \n -s [filename.in1]: Runs alpha version tests based on inserted file"
 //Function definition
 void help(int Primary_ErrorCode,char Secondary_ErrorCode);

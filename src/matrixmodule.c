@@ -8,7 +8,7 @@
 | Date: 04 October 2021                                                                                |
 +-----------------------------------------------------------------------------------------------------*/
 #include "roapmatrix.h"
-
+#include "roaphelp.h"
 /*Function Name: matrixalloc
   Input: 2 integers (number of collumns and lines)
   Output: pointer to pointer to int
@@ -33,19 +33,23 @@ int** matrixalloc(int lines, int colummns){
 /*Function Name: cellseed
   Input: Matrix (pointer to pointer to int), 3 integers (cell to update line and collumn and cell update data)
   Output: No Return. Cell Value updated on Matrix
-  Date Created: 04 Out 2021
-  Last Revised: 
+  Date Created: 04 Oct 2021
+  Last Revised: 13 Oct 2021, Added fail-safe
   Definition: Update cell values. Verbosely indicates if cell is white, grey, black or treasure
 */
- void cellseed(int**matrix, int cellline, int cellcol, int celldata){
+ void cellseed(int**matrix, int cellline, int cellcol, int celldata, int lines, int colummns){
+	lines -=1;
+	colummns -=1;
 	cellcol-=1; //update lines and collumns, since the matrix starts in (0,0)
 	cellline-=1;
+	if(cellcol<0 || cellcol > colummns || cellline <0 || cellline > lines) //fail-safe
+		help(Read_Error, Bad_Info);
 	matrix[cellline][cellcol]=celldata;
 }
 /*Function Name: freematrix
   Input: Matrix (pointer to pointer to int), 2 integers (number of lines and colummns)
   Output: No Return. Free'd matrix related blocks from Heap
-  Date Created: 05 Out 2021
+  Date Created: 05 Oct 2021
   Last Revised:
   Definition: free allocated matrix completly
 */

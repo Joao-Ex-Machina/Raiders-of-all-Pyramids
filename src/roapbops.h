@@ -17,9 +17,11 @@
 #define white 0
 #define black -1
 #define grey 1
+#define path -2
 
 int variant_test(int** matrix, int targetcellline, int targetcellcol, int targetcellline2, int targetcellcol2, char varID[2], int lines, int colummns);
 int check_neighbours (int** matrix, int targetcelllline, int targetcellcol, int lines, int columns, int colour);
 int check_breakability(int** matrix, int targetcelllline, int targetcellcol, int lines, int columns);
 int* check_bounds(int targetcellline, int targetcellcol, int lines, int colummns);
+int flood_room(int** matrix, int targetcellline, int targetcellcol,int targetcellline2, int targetcellcol2, int lines, int colummns, int firstflag );
 #endif
