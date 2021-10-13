@@ -147,16 +147,20 @@ int* check_bounds(int targetcellline, int targetcellcol, int lines, int colummns
 int flood_room(int** matrix, int targetcellline, int targetcellcol,int targetcellline2, int targetcellcol2, int lines, int colummns, int firstflag ){
 	int result=0;
 	if(firstflag==1){
-		if(targetcellline < 0 ||targetcellline2 < 0 || targetcellline > lines || targetcellline2 > lines || targetcellcol < 0 ||targetcellcol2 < 0 || targetcellcol > colummns || targetcellcol2 > colummns)
-		result =-2;
-		return result;
+		if(targetcellline < 0 ||targetcellline2 < 0 || targetcellline > lines || targetcellline2 > lines || targetcellcol < 0 ||targetcellcol2 < 0 || targetcellcol > colummns || targetcellcol2 > colummns){
+			result =-2;
+			return result;
+		}
 	}
 	if(firstflag==0){
                 if(targetcellline < 0 ||targetcellline2 < 0 || targetcellline > lines || targetcellline2 > lines || targetcellcol < 0 ||targetcellcol2 < 0 || targetcellcol > colummns || targetcellcol2 > colummns)
-                return 1;
+                return 0;
         }
+	if(matrix[targetcellline2][targetcellcol2]==path){
+        	result =1;
+		return result;
+	}
 	if(matrix[targetcellline][targetcellcol]==white){
-
 		matrix[targetcellline][targetcellcol]=path;
 		if(targetcellline < lines) //used in order to reduced memory allocated by check_bounds
 			flood_room(matrix,targetcellline+1,targetcellcol, targetcellline2, targetcellcol2, lines,colummns, 0);
@@ -172,7 +176,6 @@ int flood_room(int** matrix, int targetcellline, int targetcellcol,int targetcel
 	if(firstflag==1) {		//confirm we are back to the first instance of the function
 		if(matrix[targetcellline2][targetcellcol2]==path)
 			result =1;	
-		return result;
 	}
 	return result;
 }
