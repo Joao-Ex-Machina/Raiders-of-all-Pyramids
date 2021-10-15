@@ -147,7 +147,8 @@ int* check_bounds(int targetcellline, int targetcellcol, int lines, int colummns
 	return bounds;
 }
 //12 Oct
-int flood_room(int** matrix, int targetcellline, int targetcellcol,int targetcellline2, int targetcellcol2, int lines, int colummns, int firstflag ){
+int flood_room(int** matrix, int targetcellline, int targetcellcol,int targetcellline2, int targetcellcol2, int lines, int colummns, bool firstflag ){
+	bool debug = false;
 	int result=0;
 	if(firstflag==1){
 		if(targetcellline < 0 ||targetcellline2 < 0 || targetcellline >(lines-1) || targetcellline2 > (lines-1) || targetcellcol < 0 ||targetcellcol2 < 0 || targetcellcol >(colummns-1) || targetcellcol2 > (colummns-1)){
@@ -165,13 +166,15 @@ int flood_room(int** matrix, int targetcellline, int targetcellcol,int targetcel
 	}
 	if(matrix[targetcellline][targetcellcol]==white){
 		matrix[targetcellline][targetcellcol]=path;
+		if(debug==true)
+			printf("%d %d \n", targetcellline, targetcellcol);
 		if(targetcellline < (lines-1)) //used in order to reduced memory allocated by check_bounds
 			flood_room(matrix,targetcellline+1,targetcellcol, targetcellline2, targetcellcol2, lines,colummns, 0);
-		if(targetcellline > 1)
+		if(targetcellline > 0)
 			flood_room(matrix,targetcellline-1,targetcellcol, targetcellline2, targetcellcol2, lines,colummns, 0);
 		if(targetcellcol < (colummns-1))
 			flood_room(matrix,targetcellline,targetcellcol+1, targetcellline2, targetcellcol2, lines,colummns, 0);
-		if(targetcellcol > 1)
+		if(targetcellcol > 0)
 			flood_room(matrix,targetcellline,targetcellcol-1, targetcellline2, targetcellcol2, lines,colummns, 0);
 	}
 	else

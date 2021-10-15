@@ -34,15 +34,20 @@
 	while (feof(fp)==0){
 		readctrl = -1; //reset control and counter
 		readcnt = 0;
-			fscanf(fp, "%d %d %d %d %s", &lines, &colummns, &targetcellline, &targetcelllcol, varID);
-			if(strcmp(varID,"A6")==0) //check if variant A6 is active
-				fscanf(fp, "%d %d", &targetcellline2, &targetcelllcol2);
-			fscanf(fp, "%d", &readctrl);
-			matrix = matrixalloc(lines, colummns); //generate read matrix
-			while (readcnt<readctrl){
-				fscanf(fp, "%d %d %d", &cellline, &cellcol, &celldata);
-				cellseed(matrix, cellline, cellcol, celldata, lines, colummns);
-				readcnt++;
+		if((fscanf(fp, "%d %d %d %d %s", &lines, &colummns, &targetcellline, &targetcelllcol, varID)) !=5 && feof(fp)==0)
+			help(Read_Error, Bad_Info);
+		if(strcmp(varID,"A6")==0){ //check if variant A6 is active
+			if((fscanf(fp, "%d %d", &targetcellline2, &targetcelllcol2))!=2  && feof(fp)==0)
+				help(Read_Error, Bad_Info);
+		}
+		if((fscanf(fp, "%d", &readctrl)) !=1  && feof(fp)==0)
+			help(Read_Error, Bad_Info);
+		matrix = matrixalloc(lines, colummns); //generate read matrix
+		while (readcnt<readctrl){
+			if((fscanf(fp, "%d %d %d", &cellline, &cellcol, &celldata)) !=3 && feof(fp)==0)
+					help(Read_Error, Bad_Info);
+			cellseed(matrix, cellline, cellcol, celldata, lines, colummns);
+			readcnt++;
 			}
 			if(feof(fp)!=0)
                                 break;
