@@ -23,7 +23,8 @@
  void readwritefile(char*_filenamein, int sflag){
 	int** matrix = NULL;
 	int readctrl = -1, readcnt = -0, result=0;
-	int lines=0, colummns=0, cellline=0, cellcol=0, celldata=0, targetcellline=0, targetcelllcol=0,targetcellline2=0, targetcelllcol2=0;	
+	bool brkFlag = false;
+	int lines=0, colummns=0, cellline=0, cellcol=0, celldata=0, targetcellline=0, targetcellcol=0,targetcellline2=1, targetcellcol2=1;	
 	char varID[2] ={'\0'};
 	char* _filenameout= gen_outname(_filenamein);
 	check_inname(_filenamein, sflag);
@@ -32,30 +33,49 @@
 	if (fp == NULL)
 		help(Read_Error,File_Not_Found); 
 	while (feof(fp)==0){
-		readctrl = -1; //reset control and counter
+		readctrl = -1; //reset as security method
 		readcnt = 0;
-		if((fscanf(fp, "%d %d %d %d %s", &lines, &colummns, &targetcellline, &targetcelllcol, varID)) !=5 && feof(fp)==0)
+		brkFlag = false;
+		lines=0;
+		colummns=0;
+		cellline=0; 
+		cellcol=0; 
+		celldata=0; 
+		targetcellline=0; 
+		targetcellcol=0; 
+		targetcellline2=1; 
+		targetcellcol2=1;
+		if((fscanf(fp, "%d %d %d %d %s", &lines, &colummns, &targetcellline, &targetcellcol, varID)) !=5 && feof(fp)==0)
 			help(Read_Error, Bad_Info);
 		if(strcmp(varID,"A6")==0){ //check if variant A6 is active
-			if((fscanf(fp, "%d %d", &targetcellline2, &targetcelllcol2))!=2  && feof(fp)==0)
+			if((fscanf(fp, "%d %d", &targetcellline2, &targetcellcol2))!=2  && feof(fp)==0)
 				help(Read_Error, Bad_Info);
 		}
 		if((fscanf(fp, "%d", &readctrl)) !=1  && feof(fp)==0)
 			help(Read_Error, Bad_Info);
-		matrix = matrixalloc(lines, colummns); //generate read matrix
+		if((targetcellline < 1||targetcellline2 < 1||targetcellcol < 1||targetcellcol2 < 1|| targetcellline > lines ||targetcellline2 > lines || targetcellcol > colummns ||targetcellcol2 > colummns) && feof(fp)==0){
+			result =-2;
+			brkFlag = true;
+		}
+		if(brkFlag==false) 
+			matrix = matrixalloc(lines, colummns); //generate read matrix
 		while (readcnt<readctrl){
 			if((fscanf(fp, "%d %d %d", &cellline, &cellcol, &celldata)) !=3 && feof(fp)==0)
-					help(Read_Error, Bad_Info);
-			cellseed(matrix, cellline, cellcol, celldata, lines, colummns);
+				help(Read_Error, File_Not_Found);
+			if(brkFlag==false)
+				cellseed(matrix, cellline, cellcol, celldata, lines, colummns);
 			readcnt++;
 			}
 			if(feof(fp)!=0)
                                 break;
-			result=variant_test(matrix, targetcellline, targetcelllcol, targetcellline2, targetcelllcol2, varID, lines, colummns);
+			if(brkFlag==false)
+				result=variant_test(matrix, targetcellline, targetcellcol, targetcellline2, targetcellcol2, varID, lines, colummns);
                 	fprintf(fpout,"%d\n\n",result);
-			freematrix(matrix, lines, colummns);
+			if(brkFlag==false)
+				freematrix(matrix, lines, colummns);
 		}
-	freematrix(matrix,lines,colummns);
+	if(brkFlag==false)
+		freematrix(matrix,lines,colummns);
 	fclose(fp);
 	fclose(fpout);
 	free (_filenameout);

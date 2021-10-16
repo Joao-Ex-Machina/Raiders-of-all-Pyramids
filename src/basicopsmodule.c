@@ -9,9 +9,13 @@
 +-----------------------------------------------------------------------------------------------------*/
 #include "roapbops.h"
 #include "roaphelp.h"
-// START 05 Out Im going to sleep
-// revised on 07 oct
-//
+/*Function Name: variant_test
+  Input: Indicated downward (TMTA)
+  Output: Integer (result)
+  Date Created: 05 Out 2021
+  Last Revised: 12 Out 2021
+  Definition: Main result management function
+*/
 int variant_test(int** matrix, int targetcellline, int targetcellcol, int targetcellline2, int targetcellcol2, char varID[2], int lines, int colummns){
 	targetcellline -=1; //update to target to be on pair with a matrix starting in (0,0)
 	targetcellcol -=1;
@@ -19,7 +23,7 @@ int variant_test(int** matrix, int targetcellline, int targetcellcol, int target
 	targetcellcol2 -=1;
 	int result = -3;
 	if(varID[0]!='A')
-		help(Read_Error, Unknown_Operation); //TBI
+		help(Read_Error, Unknown_Operation);
 	switch(varID[1]){
 		case '1':
 			if(targetcellline > (lines-1) || targetcellline < 0 || targetcellcol > (colummns-1) || targetcellcol < 0 )
@@ -47,8 +51,13 @@ int variant_test(int** matrix, int targetcellline, int targetcellcol, int target
 	return result;
 }
 
-//started on 06 oct
-//revised 07 oct
+/*Function Name: check_neighbours
+  Input: 5 integers, pointer to pointer to int (matrix)
+  Output: Integer
+  Date Created: 06 Out 2021
+  Last Revised: 07 Out 2021
+  Definition: Check crossed neighbours of a cell
+*/
 int check_neighbours (int** matrix, int targetcellline, int targetcellcol, int lines, int colummns, int colour){
 	int result=0;
 	int* bounds=0;
@@ -98,7 +107,13 @@ int check_neighbours (int** matrix, int targetcellline, int targetcellcol, int l
 	free(bounds);
 	return result;
 }
- //07 oct
+ /*Function Name: check_breakability
+  Input: four integers, pointer to pointer to integers
+  Output: integer (result)
+  Date Created: 07 Out 2021
+  Last Revised: 07 Out 2021
+  Definition: Check is a grey cell is breakble (one straight path is makeable )
+*/
 int check_breakability(int** matrix, int targetcellline, int targetcellcol, int lines, int colummns){
 	int* bounds=0;
 	int result=0;
@@ -133,7 +148,13 @@ int check_breakability(int** matrix, int targetcellline, int targetcellcol, int 
 	free(bounds);
 	return result;
 }
-//07 oct
+/*Function Name: check_bounds
+  Input: 4 integers 
+  Output: array of integers
+  Date Created: 07 Out 2021
+  Last Revised: 07 Out 2021
+  Definition: Main check bounds function
+*/
 int* check_bounds(int targetcellline, int targetcellcol, int lines, int colummns){
 	int* bounds=(int*)calloc(4, sizeof(int));
 	if(targetcellcol==0)
@@ -146,7 +167,14 @@ int* check_bounds(int targetcellline, int targetcellcol, int lines, int colummns
 		bounds[right]=1;
 	return bounds;
 }
-//12 Oct
+/*Function Name: flood_room
+  Input: 
+  Output: Integer
+  Date Created: 12 Out 2021
+  Last Revised: 16 Out 2021 (added flood prediction)
+  Definition: Flood-based algorithm to discover if two cells are in the same room
+  Based on: 
+*/
 int flood_room(int** matrix, int targetcellline, int targetcellcol,int targetcellline2, int targetcellcol2, int lines, int colummns, bool firstflag ){
 	bool debug = false;
 	int result=0;
@@ -168,13 +196,13 @@ int flood_room(int** matrix, int targetcellline, int targetcellcol,int targetcel
 		matrix[targetcellline][targetcellcol]=path;
 		if(debug==true)
 			printf("%d %d \n", targetcellline, targetcellcol);
-		if(targetcellline < (lines-1)) //used in order to reduced memory allocated by check_bounds
+		if(targetcellline < (lines-1) && (matrix[targetcellline+1][targetcellcol] == white)) //used in order to reduced memory allocated by check_bounds() and predict flood
 			flood_room(matrix,targetcellline+1,targetcellcol, targetcellline2, targetcellcol2, lines,colummns, 0);
-		if(targetcellline > 0)
+		if(targetcellcol < (colummns-1)  && (matrix[targetcellline][targetcellcol+1] == white))
+                        flood_room(matrix,targetcellline,targetcellcol+1, targetcellline2, targetcellcol2, lines,colummns, 0);
+		if(targetcellline > 0 && (matrix[targetcellline-1][targetcellcol] == white))
 			flood_room(matrix,targetcellline-1,targetcellcol, targetcellline2, targetcellcol2, lines,colummns, 0);
-		if(targetcellcol < (colummns-1))
-			flood_room(matrix,targetcellline,targetcellcol+1, targetcellline2, targetcellcol2, lines,colummns, 0);
-		if(targetcellcol > 0)
+		if(targetcellcol > 0 && (matrix[targetcellline][targetcellcol-1] == white))
 			flood_room(matrix,targetcellline,targetcellcol-1, targetcellline2, targetcellcol2, lines,colummns, 0);
 	}
 	else

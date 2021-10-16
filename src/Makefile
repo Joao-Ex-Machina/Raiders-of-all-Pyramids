@@ -1,7 +1,7 @@
 #compiler
 CC = gcc
 #compile flags (in the valgrind debugging stage the flag -ggdb3 was also being used
-CFLAGS  = -Wall -std=c99 -O3
+CFLAGS  = -Wall -std=c99 -g
 #executable
 default: roap
 #Linking
