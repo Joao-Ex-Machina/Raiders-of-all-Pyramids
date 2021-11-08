@@ -45,7 +45,7 @@ int variant_test(int** matrix, int targetcellline, int targetcellcol, int target
 			result=check_breakability(matrix, targetcellline, targetcellcol, lines, colummns);
 		break;
 		case '6':
-			result=flood_room(matrix,targetcellline,targetcellcol, targetcellline2, targetcellcol2, lines,colummns, 1);
+			result=flood_room(matrix,targetcellline,targetcellcol, targetcellline2, targetcellcol2, lines,colummns,path, 1, 0);
 		break;
 	}
 	return result;
@@ -130,7 +130,7 @@ int check_breakability(int** matrix, int targetcellline, int targetcellcol, int 
 	}
 
 	if(bounds[left]==0 && bounds[right]==0){ //Verify if there's any bound. In positive case discard that path
-		if(matrix[targetcellline][targetcellcol-1]==0 && matrix[targetcellline][targetcellcol+1]==0){
+		if((matrix[targetcellline][targetcellcol-1]==0 && matrix[targetcellline][targetcellcol+1]==0) || (matrix[targetcellline][targetcellcol-1]<-1 && matrix[targetcellline][targetcellcol+1]<-1)){
 			result=1;
 			free(bounds);
 			return result;
@@ -138,7 +138,7 @@ int check_breakability(int** matrix, int targetcellline, int targetcellcol, int 
 
 	}
 	if(bounds[up]==0 && bounds[down]==0){
-                if(matrix[targetcellline-1][targetcellcol]==0 && matrix[targetcellline+1][targetcellcol]==0){
+                if((matrix[targetcellline][targetcellcol-1]==0 && matrix[targetcellline][targetcellcol+1]==0) || (matrix[targetcellline][targetcellcol-1]<-1 && matrix[targetcellline][targetcellcol+1]<-1)){
                         result=1;
 			free(bounds);
 			return result;
@@ -175,7 +175,7 @@ int* check_bounds(int targetcellline, int targetcellcol, int lines, int colummns
   Definition: Flood-based algorithm to discover if two cells are in the same room
   Based on: 
 */
-int flood_room(int** matrix, int targetcellline, int targetcellcol,int targetcellline2, int targetcellcol2, int lines, int colummns, bool firstflag ){
+int flood_room(int** matrix, int targetcellline, int targetcellcol,int targetcellline2, int targetcellcol2, int lines, int colummns,int colour, bool firstflag, bool justfloodflag){
 	bool debug = false;
 	int result=0;
 	if(firstflag==1){
@@ -188,27 +188,30 @@ int flood_room(int** matrix, int targetcellline, int targetcellcol,int targetcel
                 if(targetcellline < 0 ||targetcellline2 < 0 || targetcellline > (lines-1) || targetcellline2 > (lines-1) || targetcellcol < 0 ||targetcellcol2 < 0 || targetcellcol > (colummns-1) || targetcellcol2 > (colummns-1))
                 return 0;
         }
-	if(matrix[targetcellline2][targetcellcol2]==path){ //no need to continue path-finding
-        	result =1;
-		return result;
+	if(justfloodflag==false){
+		if(matrix[targetcellline2][targetcellcol2]==path){ //no need to continue path-finding
+        		result =1;
+			return result;
+		}
 	}
+
 	if(matrix[targetcellline][targetcellcol]==white){
-		matrix[targetcellline][targetcellcol]=path;
+		matrix[targetcellline][targetcellcol]=colour;
 		if(debug==true)
 			printf("%d %d \n", targetcellline, targetcellcol);
 		if(targetcellline < (lines-1) && (matrix[targetcellline+1][targetcellcol] == white)) //used in order to reduced memory allocated by check_bounds() and predict flood
-			flood_room(matrix,targetcellline+1,targetcellcol, targetcellline2, targetcellcol2, lines,colummns, 0);
+			flood_room(matrix,targetcellline+1,targetcellcol, targetcellline2, targetcellcol2, lines,colummns,colour, 0, justfloodflag);
 		if(targetcellcol < (colummns-1)  && (matrix[targetcellline][targetcellcol+1] == white))
-                        flood_room(matrix,targetcellline,targetcellcol+1, targetcellline2, targetcellcol2, lines,colummns, 0);
+                        flood_room(matrix,targetcellline,targetcellcol+1, targetcellline2, targetcellcol2, lines,colummns, colour,0, justfloodflag);
 		if(targetcellline > 0 && (matrix[targetcellline-1][targetcellcol] == white))
-			flood_room(matrix,targetcellline-1,targetcellcol, targetcellline2, targetcellcol2, lines,colummns, 0);
+			flood_room(matrix,targetcellline-1,targetcellcol, targetcellline2, targetcellcol2, lines,colummns, colour,0, justfloodflag);
 		if(targetcellcol > 0 && (matrix[targetcellline][targetcellcol-1] == white))
-			flood_room(matrix,targetcellline,targetcellcol-1, targetcellline2, targetcellcol2, lines,colummns, 0);
+			flood_room(matrix,targetcellline,targetcellcol-1, targetcellline2, targetcellcol2, lines,colummns, colour, 0, justfloodflag);
 	}
 	else
 		return 0;
 	if(firstflag==1) {		//confirm we are back to the first instance of the function
-		if(matrix[targetcellline2][targetcellcol2]==path)
+		if(matrix[targetcellline2][targetcellcol2]==colour)
 			result =1;	
 	}
 	return result;

@@ -12,7 +12,7 @@
 #include "roaphelp.h"
 #include "roapbops.h"
 #include "roapmatrix.h"
-
+#include "roapgrops.h"
 /*Function Name: readfile
   Input: Pointer to char (name of the file to be read)
   Output: pointer to pointer to int (matrix)
@@ -26,10 +26,11 @@
 	bool brkFlag = false;
 	int lines=0, colummns=0, cellline=0, cellcol=0, celldata=0, targetcellline=0, targetcellcol=0,targetcellline2=1, targetcellcol2=1;	
 	char varID[2] ={'\0'};
-	char* _filenameout= gen_outname(_filenamein);
+	char* _filenameout= gen_outname(_filenamein, sflag);
 	check_inname(_filenamein, sflag);
 	FILE* fp = fopen(_filenamein,"r");
 	FILE* fpout=fopen(_filenameout, "w");
+	graph* grapho;
 	if (fp == NULL)
 		help(Read_Error,File_Not_Found); 
 	while (feof(fp)==0){
@@ -45,11 +46,14 @@
 		targetcellcol=0; 
 		targetcellline2=1; 
 		targetcellcol2=1;
-		if((fscanf(fp, "%d %d %d %d %s", &lines, &colummns, &targetcellline, &targetcellcol, varID)) !=5 && feof(fp)==0)
+		if((fscanf(fp, "%d %d %d %d", &lines, &colummns, &targetcellline, &targetcellcol)) !=4 && feof(fp)==0)
 			help(Read_Error, Bad_Info);
-		if(strcmp(varID,"A6")==0){ //check if variant A6 is active
-			if((fscanf(fp, "%d %d", &targetcellline2, &targetcellcol2))!=2  && feof(fp)==0)
-				help(Read_Error, Bad_Info);
+		if(sflag ==1){
+			if((fscanf(fp, "%s",varID))!=1 && feof(fp)==0)
+			if(strcmp(varID,"A6")==0){ //check if variant A6 is active
+				if((fscanf(fp, "%d %d", &targetcellline2, &targetcellcol2))!=2  && feof(fp)==0)
+					help(Read_Error, Bad_Info);
+			}
 		}
 		if((fscanf(fp, "%d", &readctrl)) !=1  && feof(fp)==0)
 			help(Read_Error, Bad_Info);
@@ -68,9 +72,18 @@
 			}
 			if(feof(fp)!=0)
                                 break;
-			if(brkFlag==false)
-				result=variant_test(matrix, targetcellline, targetcellcol, targetcellline2, targetcellcol2, varID, lines, colummns);
-                	fprintf(fpout,"%d\n\n",result);
+			if(brkFlag==false){
+				if(sflag==1)
+					result=variant_test(matrix, targetcellline, targetcellcol, targetcellline2, targetcellcol2, varID, lines, colummns);
+				
+				else{
+					printf("target: %d %d", targetcellline, targetcellcol);
+					grapho=CaBgraph(matrix,lines,colummns,targetcellline,targetcellcol);
+					printgraph(grapho);
+				}
+			}
+				if(sflag==1)
+					fprintf(fpout,"%d\n\n",result);
 			if(brkFlag==false)
 				freematrix(matrix, lines, colummns);
 		}
@@ -82,15 +95,23 @@
 
  }
 //08 Oct
-char* gen_outname(char* _filenamein){
+char* gen_outname(char* _filenamein, int sflag){
 	int lenght=strlen(_filenamein);
 	char* _filenameout=(char*)malloc((sizeof(char)*lenght)+2);
 	strcpy(_filenameout, _filenamein);
-	_filenameout[lenght-3]='s';
-	_filenameout[lenght-2]='o';
-	_filenameout[lenght-1]='l';
-	_filenameout[lenght]='1';
-	_filenameout[lenght+1]='\0';
+	if(sflag==1){
+		_filenameout[lenght-3]='s';
+		_filenameout[lenght-2]='o';
+		_filenameout[lenght-1]='l';
+		_filenameout[lenght]='1';
+		_filenameout[lenght+1]='\0';
+	}
+	else{
+                _filenameout[lenght-2]='s';
+                _filenameout[lenght-1]='o';
+                _filenameout[lenght]='l';
+                _filenameout[lenght+1]='\0';
+        }
 	return _filenameout;
 }
 //08 Oct
@@ -100,4 +121,8 @@ void check_inname(char* _filenamein,int sflag){
 		if(_filenamein[lenght-3]!='i' || _filenamein[lenght-2] !='n'||_filenamein[lenght-1] != '1')
 			help(Read_Error, Unsupported_Extension);
 	}
+	else {
+		if(_filenamein[lenght-2]!='i' || _filenamein[lenght-1] !='n')
+                        help(Read_Error, Unsupported_Extension);
+        }
 }

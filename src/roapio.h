@@ -14,7 +14,7 @@
 #include <string.h>
 #include <ctype.h>
 void readwritefile(char*_filenamein, int sflag);
-char* gen_outname(char* _filenamein);
+char* gen_outname(char* _filenamein, int sflag);
 void check_inname(char* _filenamein,int sflag);
 #endif
 

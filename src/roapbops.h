@@ -23,5 +23,5 @@ int variant_test(int** matrix, int targetcellline, int targetcellcol, int target
 int check_neighbours (int** matrix, int targetcelllline, int targetcellcol, int lines, int columns, int colour);
 int check_breakability(int** matrix, int targetcelllline, int targetcellcol, int lines, int columns);
 int* check_bounds(int targetcellline, int targetcellcol, int lines, int colummns);
-int flood_room(int** matrix, int targetcellline, int targetcellcol,int targetcellline2, int targetcellcol2, int lines, int colummns, bool firstflag );
+int flood_room(int** matrix, int targetcellline, int targetcellcol,int targetcellline2, int targetcellcol2, int lines, int colummns,int colour, bool firstflag, bool justfloodflag);
 #endif
