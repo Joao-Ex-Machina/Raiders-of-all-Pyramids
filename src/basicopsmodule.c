@@ -138,7 +138,7 @@ int check_breakability(int** matrix, int targetcellline, int targetcellcol, int 
 
 	}
 	if(bounds[up]==0 && bounds[down]==0){
-                if((matrix[targetcellline][targetcellcol-1]==0 && matrix[targetcellline][targetcellcol+1]==0) || (matrix[targetcellline][targetcellcol-1]<-1 && matrix[targetcellline][targetcellcol+1]<-1)){
+                if((matrix[targetcellline-1][targetcellcol]==0 && matrix[targetcellline+1][targetcellcol]==0) || (matrix[targetcellline-1][targetcellcol]<-1 && matrix[targetcellline+1][targetcellcol]<-1)){
                         result=1;
 			free(bounds);
 			return result;

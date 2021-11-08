@@ -22,15 +22,16 @@
 */
  void readwritefile(char*_filenamein, int sflag){
 	int** matrix = NULL;
-	int readctrl = -1, readcnt = -0, result=0;
-	bool brkFlag = false;
+	int readctrl = -1, readcnt = -0, result=0, i=0;
+	bool brkFlag = false, debug = false;
 	int lines=0, colummns=0, cellline=0, cellcol=0, celldata=0, targetcellline=0, targetcellcol=0,targetcellline2=1, targetcellcol2=1;	
 	char varID[2] ={'\0'};
 	char* _filenameout= gen_outname(_filenamein, sflag);
 	check_inname(_filenamein, sflag);
 	FILE* fp = fopen(_filenamein,"r");
 	FILE* fpout=fopen(_filenameout, "w");
-	graph* grapho;
+	graph* grapho= NULL;
+	node *aux=NULL, *aux2=NULL;
 	if (fp == NULL)
 		help(Read_Error,File_Not_Found); 
 	while (feof(fp)==0){
@@ -78,17 +79,30 @@
 				
 				else{
 					printf("target: %d %d", targetcellline, targetcellcol);
-					grapho=CaBgraph(matrix,lines,colummns,targetcellline,targetcellcol);
-					printgraph(grapho);
+					grapho=CaBgraph(matrix,lines,colummns,targetcellline,targetcellcol); /*add filenameout*/
+					if(debug==true)
+						printgraph(grapho);
 				}
 			}
 				if(sflag==1)
 					fprintf(fpout,"%d\n\n",result);
-			if(brkFlag==false)
+			if(brkFlag==false){
 				freematrix(matrix, lines, colummns);
+				if(grapho !=NULL){
+					 for (i = 0; i < (grapho->TotalVertex); i++){
+        					for (aux = grapho->adjlist[i]; aux != NULL; aux = aux2){
+            						aux2 = aux->next;
+							free(aux);
+        					}
+    					}
+					free(grapho->adjlist);
+					free(grapho);
+				}	
+			}
 		}
-	if(brkFlag==false)
+	if(brkFlag==false){
 		freematrix(matrix,lines,colummns);
+	}
 	fclose(fp);
 	fclose(fpout);
 	free (_filenameout);

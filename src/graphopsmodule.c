@@ -56,6 +56,7 @@ node* CaIoUnode (int vertexID, int edge_cost, int brokenCol, int brokenLine,  no
 graph* CaBgraph(int **matrix, int lines, int colummns, int targetcellline, int targetcellcol){  /*Create and Build Graph*/
 	graph* grapho = (graph*)malloc(sizeof(graph));
 	int i=0, j=0, dummyresult=0, colour =-4, vertex=0;
+	bool debug=false;
 	/*Start with flooding both start and end room, as they need to be fixed colours*/
 	lines-=1;
 	colummns-=1;
@@ -81,15 +82,18 @@ graph* CaBgraph(int **matrix, int lines, int colummns, int targetcellline, int t
 			/*the last flag inibts comparision with (0,0) actively working as a dud, as the unused dummy result, the objective is to distinct different rooms only*/
 				colour--; /*change colour*/
 				vertex++; /*new room(aka Vertex) was mapped*/
-				printf("%d\n", vertex);	
+				if(debug==true)
+					printf("%d\n", vertex);	
 			}
 		}
 	}
-	for (i=0; i< lines; i++){
-                for(j=0; j< colummns; j++){
-			printf(" %d ", matrix[i][j]);
+	if(debug==true){
+		for (i=0; i< lines; i++){
+                	for(j=0; j< colummns; j++){
+				printf(" %d ", matrix[i][j]);
+			}
+			printf("\n");
 		}
-		printf("\n");
 	}
 	 grapho->adjlist = (node**)calloc(1, (sizeof(node*) * (vertex))); /*alloc adjacency list array*/
 	grapho->TotalVertex=vertex;
@@ -103,9 +107,9 @@ graph* CaBgraph(int **matrix, int lines, int colummns, int targetcellline, int t
 					}
 				}
 				if(i>0 && i < lines){
-					if((matrix[i-1][j]<-1 && matrix[i+1][j]<-1)&& (matrix[i][j-1] != matrix[i][j+1])){
+					if((matrix[i-1][j]<-1 && matrix[i+1][j]<-1)&& (matrix[i-1][j] != matrix[i+1][j])){
                                         	grapho->adjlist[abs(matrix[i+1][j])-2] = CaIoUnode(abs(matrix[i-1][j])-2,matrix[i][j],i,j,grapho->adjlist[abs(matrix[i+1][j])-2]);
-                                        	grapho->adjlist[abs(matrix[i-1][j])-2] = CaIoUnode(abs(matrix[i+1][j-1])-2,matrix[i][j],i,j,grapho->adjlist[abs(matrix[i-1][j])-2]);
+                                        	grapho->adjlist[abs(matrix[i-1][j])-2] = CaIoUnode(abs(matrix[i+1][j])-2,matrix[i][j],i,j,grapho->adjlist[abs(matrix[i-1][j])-2]);
                                 	}
 				}
 
