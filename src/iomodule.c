@@ -23,7 +23,7 @@
  void readwritefile(char*_filenamein, int sflag){
 	int** matrix = NULL;
 	int readctrl = -1, readcnt = -0, result=0, i=0;
-	bool brkFlag = false, debug = false;
+	bool brkFlag = false, debug = true;
 	int lines=0, colummns=0, cellline=0, cellcol=0, celldata=0, targetcellline=0, targetcellcol=0,targetcellline2=1, targetcellcol2=1;	
 	char varID[2] ={'\0'};
 	char* _filenameout= gen_outname(_filenamein, sflag);
@@ -58,7 +58,7 @@
 		}
 		if((fscanf(fp, "%d", &readctrl)) !=1  && feof(fp)==0)
 			help(Read_Error, Bad_Info);
-		if((targetcellline < 1||targetcellline2 < 1||targetcellcol < 1||targetcellcol2 < 1|| targetcellline > lines ||targetcellline2 > lines || targetcellcol > colummns ||targetcellcol2 > colummns) && feof(fp)==0){
+		if((targetcellline < 1||targetcellline2 < 1||targetcellcol < 1||targetcellcol2 < 1|| targetcellline > lines ||targetcellline2 > lines || targetcellcol > colummns ||targetcellcol2 > colummns) && feof(fp)==0 && sflag==1){
 			result =-2;
 			brkFlag = true;
 		}
@@ -87,7 +87,8 @@
 				if(sflag==1)
 					fprintf(fpout,"%d\n\n",result);
 			if(brkFlag==false){
-				freematrix(matrix, lines, colummns);
+				if(grapho==NULL)
+					freematrix(matrix, lines, colummns);
 				if(grapho !=NULL){
 					 for (i = 0; i < (grapho->TotalVertex); i++){
         					for (aux = grapho->adjlist[i]; aux != NULL; aux = aux2){
@@ -101,7 +102,8 @@
 			}
 		}
 	if(brkFlag==false){
-		freematrix(matrix,lines,colummns);
+		if(grapho==NULL)
+			freematrix(matrix,lines,colummns);
 	}
 	fclose(fp);
 	fclose(fpout);
