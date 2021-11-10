@@ -77,8 +77,6 @@
 				cellseed(matrix, cellline, cellcol, celldata, lines, colummns);
 			readcnt++;
 			}
-			if(feof(fp)!=0)
-                                break;
 			if(brkFlag==false){
 				if(sflag==1)
 					result=variant_test(matrix, targetcellline, targetcellcol, targetcellline2, targetcellcol2, varID, lines, colummns);

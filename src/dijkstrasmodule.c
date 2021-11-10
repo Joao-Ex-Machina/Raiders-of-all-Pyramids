@@ -14,7 +14,7 @@ static int hfree;     /* número de elementos existentes no acervo */
 static int hsize;
 
 void HPQinit(unsigned Size){
-	Heap = (int *)malloc(Size*sizeof(int));
+	Heap = (int *)calloc(Size,sizeof(int));
 	hsize = Size;
 	hfree = 0; 
 }
