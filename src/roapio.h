@@ -13,8 +13,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+typedef struct graph graph;
 void readwritefile(char*_filenamein, int sflag);
 char* gen_outname(char* _filenamein, int sflag);
 void check_inname(char* _filenamein,int sflag);
+void recurprint_spath(int* st,graph *grapho, FILE* fpout, int target, int* Wallnumber, int* Totalcost);
 #endif
 

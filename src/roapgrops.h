@@ -20,7 +20,7 @@ typedef struct graph{
     	int TotalVertex; /*Total Rooms*/
 }graph;
 node* CaIoUnode (int nodeID, int branch_cost, int brokenCol, int brokenLine,  node* target);
-graph* CaBgraph(int **matrix, int lines, int colummns, int targetcellline, int targetcellcolummn);
+graph* CaBgraph(int **matrix, int lines, int colummns, int targetcellline, int targetcellcolummn, FILE* fpout);
 void printgraph(graph* grapho);
 #define start -2
 #define end -3

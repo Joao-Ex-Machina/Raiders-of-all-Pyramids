@@ -47,8 +47,8 @@ node* CaIoUnode (int vertexID, int edge_cost, int brokenCol, int brokenLine,  no
                 	new->vertexID = vertexID;
                 	new->next=NULL;
                 	new->edge_cost=edge_cost;
-			new->brokenCol=brokenCol;
-                	new->brokenLine=brokenLine;
+			new->brokenCol=brokenCol+1;
+                	new->brokenLine=brokenLine+1;
                		return new;
 		}
         }
@@ -56,36 +56,35 @@ node* CaIoUnode (int vertexID, int edge_cost, int brokenCol, int brokenLine,  no
         	new->vertexID = vertexID;
         	new->next=NULL;
         	new->edge_cost=edge_cost;
-		new->brokenCol=brokenCol;
-                new->brokenLine=brokenLine;
+		new->brokenCol=brokenCol+1;
+                new->brokenLine=brokenLine+1;
 	}
 	else{
 		if((edge_cost < aux->edge_cost) || (edge_cost == aux->edge_cost)){
 			aux->edge_cost= edge_cost;
-			aux->brokenCol=brokenCol;
-			aux->brokenLine=brokenLine;
+			aux->brokenCol=brokenCol+1;
+			aux->brokenLine=brokenLine+1;
 		}
 	}
         return target;
 }
 
-graph* CaBgraph(int **matrix, int lines, int colummns, int targetcellline, int targetcellcol){  /*Create and Build Graph*/
+graph* CaBgraph(int **matrix, int lines, int colummns, int targetcellline, int targetcellcol, FILE* fpout){  /*Create and Build Graph*/
 	graph* grapho = NULL;
 	int i=0, j=0, dummyresult=0, colour =-4, vertex=0;
 	bool debug=true;
 	/*Start with flooding both start and end room, as they need to be fixed colours*/
-	lines-=1;
-	colummns-=1;
 	targetcellline-=1;
 	targetcellcol-=1;
 	dummyresult=flood_room(matrix,0,0,0,0,lines, colummns,start,1,1);
-	printf("target: %d %d", targetcellline, targetcellcol);
+	if(debug==true)
+		printf("target: %d %d", targetcellline, targetcellcol);
 	 if(targetcellline<0 || targetcellline> lines || targetcellcol<0 || targetcellcol>colummns){
-                printf("fora da matriz"); //pass to file
+                fprintf(fpout,"-1"); //pass to file
                 return grapho;
         }
 	if(matrix[targetcellline][targetcellcol]==start){
-		printf("Eram da mesma sala Omega kekers!"); //pass to file
+		fprintf(fpout,"0"); //pass to file
 		return grapho;
 	}
 	dummyresult=flood_room(matrix, targetcellline, targetcellcol,0,0, lines, colummns, end,1,1);
@@ -120,13 +119,13 @@ graph* CaBgraph(int **matrix, int lines, int colummns, int targetcellline, int t
 	for (i=0; i< lines; i++){
                 for(j=0; j< colummns; j++){
                         if(check_breakability(matrix,i,j,lines,colummns)==1){
-				if(j>0 && j < colummns){
+				if(j>0 && j < colummns-1){
 					if((matrix[i][j-1]<-1 && matrix[i][j+1]<-1) && (matrix[i][j-1] != matrix[i][j+1])){
 						grapho->adjlist[-(matrix[i][j+1])-2] = CaIoUnode(-(matrix[i][j-1])-2,matrix[i][j],j,i,grapho->adjlist[-(matrix[i][j+1])-2]);
                 				grapho->adjlist[-(matrix[i][j-1])-2] = CaIoUnode(-(matrix[i][j+1])-2,matrix[i][j],j,i,grapho->adjlist[-(matrix[i][j-1])-2]);
 					}
 				}
-				if(i>0 && i < lines){
+				if(i>0 && i < lines-1){
 					if((matrix[i-1][j]<-1 && matrix[i+1][j]<-1)&& (matrix[i-1][j] != matrix[i+1][j])){
                                         	grapho->adjlist[-(matrix[i+1][j])-2] = CaIoUnode(-(matrix[i-1][j])-2,matrix[i][j],j,i,grapho->adjlist[-(matrix[i+1][j])-2]);
                                         	grapho->adjlist[-(matrix[i-1][j])-2] = CaIoUnode(-(matrix[i+1][j])-2,matrix[i][j],j,i,grapho->adjlist[-(matrix[i-1][j])-2]);
@@ -135,8 +134,11 @@ graph* CaBgraph(int **matrix, int lines, int colummns, int targetcellline, int t
 
 			}
                 }
+		if(i>0)
+			free(matrix[i-1]);
         }
-	freematrix(matrix, lines+1, colummns+1);
+	free(matrix[lines-1]);
+	free(matrix);
 	return grapho;
 }
 void printgraph(graph* grapho){

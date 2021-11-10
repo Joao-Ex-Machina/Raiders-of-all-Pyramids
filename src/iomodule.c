@@ -13,6 +13,7 @@
 #include "roapbops.h"
 #include "roapmatrix.h"
 #include "roapgrops.h"
+#include "roapdijkstras.h"
 /*Function Name: readfile
   Input: Pointer to char (name of the file to be read)
   Output: pointer to pointer to int (matrix)
@@ -21,8 +22,9 @@
   Definition:
 */
  void readwritefile(char*_filenamein, int sflag){
-	int** matrix = NULL;
+	int** matrix = NULL, *st = NULL, *TotalCost=NULL, *Wallnumber=NULL;
 	int readctrl = -1, readcnt = -0, result=0, i=0;
+	double *wt=NULL;
 	bool brkFlag = false, debug = true;
 	int lines=0, colummns=0, cellline=0, cellcol=0, celldata=0, targetcellline=0, targetcellcol=0,targetcellline2=1, targetcellcol2=1;	
 	char varID[2] ={'\0'};
@@ -78,10 +80,18 @@
 					result=variant_test(matrix, targetcellline, targetcellcol, targetcellline2, targetcellcol2, varID, lines, colummns);
 				
 				else{
-					printf("target: %d %d", targetcellline, targetcellcol);
-					grapho=CaBgraph(matrix,lines,colummns,targetcellline,targetcellcol); /*add filenameout*/
+					if(debug==true)
+						printf("target: %d %d", targetcellline, targetcellcol);
+					grapho=CaBgraph(matrix,lines,colummns,targetcellline,targetcellcol, fpout); /*add filenameout*/
+					st = (int*)malloc(sizeof(int)*grapho->TotalVertex);
+					wt = (double*)malloc(sizeof(double)*grapho->TotalVertex);
 					if(debug==true)
 						printgraph(grapho);
+					st=dijsktras(grapho,0,st,wt);
+					Wallnumber = (int*)malloc(sizeof(int));
+					TotalCost = (int*)malloc(sizeof(int));
+					recurprint_spath(st,grapho,fpout,1,Wallnumber,TotalCost);
+
 				}
 			}
 				if(sflag==1)
@@ -98,6 +108,10 @@
     					}
 					free(grapho->adjlist);
 					free(grapho);
+					free(st);
+					free(wt);
+					free(Wallnumber);
+					free(TotalCost);
 				}	
 			}
 		}
@@ -141,4 +155,33 @@ void check_inname(char* _filenamein,int sflag){
 		if(_filenamein[lenght-2]!='i' || _filenamein[lenght-1] !='n')
                         help(Read_Error, Unsupported_Extension);
         }
+}
+
+void recurprint_spath(int* st,graph *grapho, FILE* fpout, int target, int* Wallnumber, int* Totalcost){
+        int brkLine=0,brkCol=0, cost=0;
+	node* aux=NULL;
+        if(st[1]==-1){
+                fprintf(fpout,"-1");
+                return;
+        }
+	if(target!=0){
+		(*Wallnumber)++;
+	}
+        if(target!=0){
+                recurprint_spath(st,grapho,fpout,st[target],Wallnumber,Totalcost);
+	 	for (aux = grapho->adjlist[target]; aux != NULL; aux = aux->next){
+                                if((aux->vertexID==st[target])){
+                                        brkLine=aux->brokenLine;
+                                        brkCol=aux->brokenCol;
+					cost=aux->edge_cost;
+					(*Totalcost)+=aux->edge_cost;
+                                }
+                        }
+                fprintf(fpout,"%d %d %d \n",brkLine, brkCol, cost);
+	}
+	if(target==0){
+		fprintf(fpout,"%d\n",(*Totalcost));
+		fprintf(fpout,"%d\n",(*Wallnumber));
+	}
+                
 }
