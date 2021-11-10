@@ -22,10 +22,10 @@
   Definition:
 */
  void readwritefile(char*_filenamein, int sflag){
-	int** matrix = NULL, *st = NULL, *TotalCost=NULL, *Wallnumber=NULL;
+	int** matrix = NULL, *st = NULL, *Wallnumber=NULL;
 	int readctrl = -1, readcnt = -0, result=0, i=0;
 	double *wt=NULL;
-	bool brkFlag = false, debug = true;
+	bool brkFlag = false, debug = false;
 	int lines=0, colummns=0, cellline=0, cellcol=0, celldata=0, targetcellline=0, targetcellcol=0,targetcellline2=1, targetcellcol2=1;	
 	char varID[2] ={'\0'};
 	char* _filenameout= gen_outname(_filenamein, sflag);
@@ -89,8 +89,8 @@
 						printgraph(grapho);
 					st=dijsktras(grapho,0,st,wt);
 					Wallnumber = (int*)malloc(sizeof(int));
-					TotalCost = (int*)malloc(sizeof(int));
-					recurprint_spath(st,grapho,fpout,1,Wallnumber,TotalCost);
+					Wallnumber[0]=0;
+					recurprint_spath(st,wt,grapho,fpout,1,Wallnumber);
 
 				}
 			}
@@ -111,7 +111,6 @@
 					free(st);
 					free(wt);
 					free(Wallnumber);
-					free(TotalCost);
 				}	
 			}
 		}
@@ -157,7 +156,7 @@ void check_inname(char* _filenamein,int sflag){
         }
 }
 
-void recurprint_spath(int* st,graph *grapho, FILE* fpout, int target, int* Wallnumber, int* Totalcost){
+void recurprint_spath(int* st,double* wt,graph *grapho, FILE* fpout, int target, int* Wallnumber){
         int brkLine=0,brkCol=0, cost=0;
 	node* aux=NULL;
         if(st[1]==-1){
@@ -165,23 +164,22 @@ void recurprint_spath(int* st,graph *grapho, FILE* fpout, int target, int* Walln
                 return;
         }
 	if(target!=0){
-		(*Wallnumber)++;
+		Wallnumber[0]++;
 	}
         if(target!=0){
-                recurprint_spath(st,grapho,fpout,st[target],Wallnumber,Totalcost);
+                recurprint_spath(st,wt,grapho,fpout,st[target],Wallnumber);
 	 	for (aux = grapho->adjlist[target]; aux != NULL; aux = aux->next){
                                 if((aux->vertexID==st[target])){
                                         brkLine=aux->brokenLine;
                                         brkCol=aux->brokenCol;
 					cost=aux->edge_cost;
-					(*Totalcost)+=aux->edge_cost;
                                 }
                         }
                 fprintf(fpout,"%d %d %d \n",brkLine, brkCol, cost);
 	}
 	if(target==0){
-		fprintf(fpout,"%d\n",(*Totalcost));
-		fprintf(fpout,"%d\n",(*Wallnumber));
+		fprintf(fpout,"%d\n",(int)wt[1]);
+		fprintf(fpout,"%d\n",Wallnumber[0]);
 	}
                 
 }

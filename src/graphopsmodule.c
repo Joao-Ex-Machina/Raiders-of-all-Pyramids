@@ -72,7 +72,7 @@ node* CaIoUnode (int vertexID, int edge_cost, int brokenCol, int brokenLine,  no
 graph* CaBgraph(int **matrix, int lines, int colummns, int targetcellline, int targetcellcol, FILE* fpout){  /*Create and Build Graph*/
 	graph* grapho = NULL;
 	int i=0, j=0, dummyresult=0, colour =-4, vertex=0;
-	bool debug=true;
+	bool debug=false;
 	/*Start with flooding both start and end room, as they need to be fixed colours*/
 	targetcellline-=1;
 	targetcellcol-=1;

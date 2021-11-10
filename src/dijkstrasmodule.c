@@ -29,15 +29,16 @@ void HPQinsert(int v){
 
 int* dijsktras(graph *grapho, int s, int *st, double *wt){
 	int v, w, i;
-	bool InHeap=false;
+	bool InHeap=false, debug=false;
 	node *aux;
-	printf("entered Dij");
+	if(debug==true)
+		printf("entered Dij");
 	HPQinit(grapho->TotalVertex);
 	for (v = 0; v < grapho->TotalVertex; v++){
 		st[v] = -1;
 		wt[v] = INT_MAX;
-		HPQinsert(v);
 	}
+	HPQinsert(0);
 	wt[s] = 0.0;
 	while (!HPQEmpty()){
 		if(Heap[0]==1) /*Verifies if top node is 1 aka Treasure Room*/
@@ -64,7 +65,8 @@ int* dijsktras(graph *grapho, int s, int *st, double *wt){
 			}
 		}
 	}
-	printf("ready to return from Dij");
+	if(debug==true)
+		printf("ready to return from Dij");
 	free(Heap);
 	return st;
 }
