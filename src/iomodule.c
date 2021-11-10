@@ -25,7 +25,7 @@
 	int** matrix = NULL, *st = NULL, *Wallnumber=NULL;
 	int readctrl = -1, readcnt = -0, result=0, i=0;
 	double *wt=NULL;
-	bool brkFlag = false, debug = false;
+	bool brkFlag = false, debug = false, stopread =false;
 	int lines=0, colummns=0, cellline=0, cellcol=0, celldata=0, targetcellline=0, targetcellcol=0,targetcellline2=1, targetcellcol2=1;	
 	char varID[2] ={'\0'};
 	char* _filenameout= gen_outname(_filenamein, sflag);
@@ -36,7 +36,7 @@
 	node *aux=NULL, *aux2=NULL;
 	if (fp == NULL)
 		help(Read_Error,File_Not_Found); 
-	while (feof(fp)==0){
+	while (stopread == false){
 		readctrl = -1; //reset as security method
 		readcnt = 0;
 		brkFlag = false;
@@ -49,8 +49,12 @@
 		targetcellcol=0; 
 		targetcellline2=1; 
 		targetcellcol2=1;
-		if((fscanf(fp, "%d %d %d %d", &lines, &colummns, &targetcellline, &targetcellcol)) !=4 && feof(fp)==0)
-			help(Read_Error, Bad_Info);
+		if((fscanf(fp, "%d %d %d %d", &lines, &colummns, &targetcellline, &targetcellcol)) !=4)
+			stopread=true;
+		if(stopread==true){
+			brkFlag = true;
+			break;
+		}
 		if(sflag ==1){
 			if((fscanf(fp, "%s",varID))!=1 && feof(fp)==0)
 			if(strcmp(varID,"A6")==0){ //check if variant A6 is active
@@ -82,15 +86,17 @@
 				else{
 					if(debug==true)
 						printf("target: %d %d", targetcellline, targetcellcol);
-					grapho=CaBgraph(matrix,lines,colummns,targetcellline,targetcellcol, fpout); /*add filenameout*/
-					st = (int*)malloc(sizeof(int)*grapho->TotalVertex);
-					wt = (double*)malloc(sizeof(double)*grapho->TotalVertex);
-					if(debug==true)
-						printgraph(grapho);
-					st=dijsktras(grapho,0,st,wt);
-					Wallnumber = (int*)malloc(sizeof(int));
-					Wallnumber[0]=0;
-					recurprint_spath(st,wt,grapho,fpout,1,Wallnumber);
+					grapho=CaBgraph(matrix,lines,colummns,targetcellline,targetcellcol, fpout);
+					if(grapho!=NULL){
+						st = (int*)malloc(sizeof(int)*grapho->TotalVertex);
+						wt = (double*)malloc(sizeof(double)*grapho->TotalVertex);
+						if(debug==true)
+							printgraph(grapho);
+						st=dijsktras(grapho,0,st,wt);
+						Wallnumber = (int*)malloc(sizeof(int));
+						Wallnumber[0]=0;
+						recurprint_spath(st,wt,grapho,fpout,1,Wallnumber);
+					}
 
 				}
 			}
@@ -160,7 +166,7 @@ void recurprint_spath(int* st,double* wt,graph *grapho, FILE* fpout, int target,
         int brkLine=0,brkCol=0, cost=0;
 	node* aux=NULL;
         if(st[1]==-1){
-                fprintf(fpout,"-1");
+                fprintf(fpout,"-1\n\n");
                 return;
         }
 	if(target!=0){
@@ -181,5 +187,7 @@ void recurprint_spath(int* st,double* wt,graph *grapho, FILE* fpout, int target,
 		fprintf(fpout,"%d\n",(int)wt[1]);
 		fprintf(fpout,"%d\n",Wallnumber[0]);
 	}
+	if(target==1)
+		fprintf(fpout,"\n");
                 
 }

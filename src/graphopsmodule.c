@@ -79,12 +79,12 @@ graph* CaBgraph(int **matrix, int lines, int colummns, int targetcellline, int t
 	dummyresult=flood_room(matrix,0,0,0,0,lines, colummns,start,1,1);
 	if(debug==true)
 		printf("target: %d %d", targetcellline, targetcellcol);
-	 if(targetcellline<0 || targetcellline> lines || targetcellcol<0 || targetcellcol>colummns){
-                fprintf(fpout,"-1"); //pass to file
+	 if(targetcellline<0 || targetcellline+1> lines || targetcellcol<0 || targetcellcol+1>colummns){
+                fprintf(fpout,"-1\n\n"); //pass to file
                 return grapho;
         }
 	if(matrix[targetcellline][targetcellcol]==start){
-		fprintf(fpout,"0"); //pass to file
+		fprintf(fpout,"0\n\n"); //pass to file
 		return grapho;
 	}
 	dummyresult=flood_room(matrix, targetcellline, targetcellcol,0,0, lines, colummns, end,1,1);
