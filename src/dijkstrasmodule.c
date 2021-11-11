@@ -12,9 +12,18 @@
 static int *Heap;
 static int hfree;     /* número de elementos existentes no acervo */
 static int hsize;
+/*Although not recommended we have proceded with R. Sedgewick implementation that was shown in class
+The implemented static variables were kept to reduced the number of alterations to fuctions (adding 
+new inputs such as a pointer to hfree and the Heap which we would be operating over) and variables 
+(hfree would have to be passed through a pointer) to a otherwise functional and efficient code
+The group considered that although not ideal the static variables could be kept since
+they are inacessible through other files (which was the intended) having more control over them 
+than say a global declared variable*/
 
 void HPQinit(unsigned Size){
 	Heap = (int *)calloc(Size,sizeof(int));
+	if(Heap==NULL)
+		exit(1);
 	hsize = Size;
 	hfree = 0; 
 }

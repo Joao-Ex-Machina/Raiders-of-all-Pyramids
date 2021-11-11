@@ -71,30 +71,28 @@ node* CaIoUnode (int vertexID, int edge_cost, int brokenCol, int brokenLine,  no
 
 graph* CaBgraph(int **matrix, int lines, int colummns, int targetcellline, int targetcellcol, FILE* fpout){  /*Create and Build Graph*/
 	graph* grapho = NULL;
-	int i=0, j=0, dummyresult=0, colour =-4, vertex=0;
+	int i=0, j=0, colour =-4, vertex=0;
 	bool debug=false;
 	/*Start with flooding both start and end room, as they need to be fixed colours*/
 	targetcellline-=1;
 	targetcellcol-=1;
-	dummyresult=flood_room(matrix,0,0,0,0,lines, colummns,start,1,1);
 	if(debug==true)
 		printf("target: %d %d", targetcellline, targetcellcol);
-	 if(targetcellline<0 || targetcellline+1> lines || targetcellcol<0 || targetcellcol+1>colummns){
+	 if(targetcellline<0 || targetcellline+1> lines || targetcellcol<0 || targetcellcol+1>colummns || matrix[targetcellline][targetcellcol] !=0){
                 fprintf(fpout,"-1\n\n"); //pass to file
                 return grapho;
         }
+	Queuedflood_room(matrix, 0, 0,lines, colummns, start);
 	if(matrix[targetcellline][targetcellcol]==start){
 		fprintf(fpout,"0\n\n"); //pass to file
 		return grapho;
 	}
-	dummyresult=flood_room(matrix, targetcellline, targetcellcol,0,0, lines, colummns, end,1,1);
+	Queuedflood_room(matrix, targetcellline, targetcellcol,lines, colummns, end);
 	vertex=2;
 	for (i=0; i< lines; i++){
 		for(j=0; j< colummns; j++){
 			if(matrix[i][j]==0){
-				dummyresult=flood_room(matrix,i,j, 0, 0, lines,colummns,colour, 1, 1);
-				dummyresult++;
-			/*the last flag inibts comparision with (0,0) actively working as a dud, as the unused dummy result, the objective is to distinct different rooms only*/
+				Queuedflood_room(matrix, i, j,lines, colummns, colour);
 				colour--; /*change colour*/
 				vertex++; /*new room(aka Vertex) was mapped*/
 				if(debug==true)

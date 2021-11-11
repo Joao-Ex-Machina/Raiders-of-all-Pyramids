@@ -216,3 +216,68 @@ int flood_room(int** matrix, int targetcellline, int targetcellcol,int targetcel
 	}
 	return result;
 }
+void Queuedflood_room(int** matrix, int targetcellline, int targetcellcol,int lines, int colummns, int colour){
+	floodnode* last=NULL, *popped=NULL, *pushed=NULL, *nextpop=NULL;
+	last=(floodnode*)malloc(sizeof(floodnode));
+	matrix[targetcellline][targetcellcol]=colour;
+	last->line=targetcellline;
+	last->col=targetcellcol;
+	last->next=NULL;
+	popped=last;
+	nextpop=last;
+	while(popped!=NULL){ /*effectively while the queue is not empty*/
+			popped=nextpop;
+			if(popped==NULL)
+				break;
+			matrix[(popped->line)][(popped->col)]=colour;
+			if((popped->line)< (lines-1) && (matrix[(popped->line)+1][popped->col] == white)){
+				matrix[(popped->line)+1][(popped->col)]=colour;
+				pushed=(floodnode*)malloc(sizeof(floodnode));
+				pushed->line=(popped->line)+1;
+				pushed->col=(popped->col);
+				pushed->next=NULL;
+				last->next=pushed;
+				last=pushed;
+			} 
+                	
+                	if((popped->col) < (colummns-1)  && (matrix[(popped->line)][(popped->col)+1] == white)){
+				matrix[(popped->line)][(popped->col)+1]=colour;
+				pushed=(floodnode*)malloc(sizeof(floodnode));
+                        	pushed->line=(popped->line);
+                        	pushed->col=(popped->col)+1;
+				pushed->next=NULL;
+                       		last->next=pushed;
+                        	last=pushed;
+			}
+                        
+                	if((popped->line) > 0 && (matrix[(popped->line)-1][(popped->col)] == white)){
+				matrix[(popped->line)-1][(popped->col)]=colour;
+				pushed=(floodnode*)malloc(sizeof(floodnode));
+                        	pushed->line=(popped->line)-1;
+                        	pushed->col=(popped->col);
+				pushed->next=NULL;
+                        	last->next=pushed;
+                        	last=pushed;
+			}
+                        
+                	if((popped->col) > 0 && (matrix[(popped->line)][(popped->col)-1] == white)){
+				matrix[(popped->line)][(popped->col)-1]=colour;
+				pushed=(floodnode*)malloc(sizeof(floodnode));
+                        	pushed->line=(popped->line);
+                        	pushed->col=(popped->col)-1;
+				pushed->next=NULL;
+                        	last->next=pushed;
+                        	last=pushed;
+			}
+		if(popped->next==NULL){
+			free(popped);
+			break;
+		}
+			
+		else
+			nextpop=popped->next;
+
+		free(popped);
+	}
+
+}
