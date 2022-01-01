@@ -19,7 +19,7 @@
   Output: pointer to pointer to int (matrix)
   Date Created: 05 Oct 2021
   Last Revised: 13 Oct 2021
-  Definition:
+  Definition: Main read and write function. Calls needed operative function.
 */
  void readwritefile(char*_filenamein, int sflag){
 	int** matrix = NULL, *st = NULL, *Wallnumber=NULL;
@@ -37,7 +37,7 @@
 	if (fp == NULL)
 		help(Read_Error,File_Not_Found); 
 	while (stopread == false){
-		readctrl = -1; //reset as security method
+		readctrl = -1; /*resets as security methods*/
 		readcnt = 0;
 		brkFlag = false;
 		lines=0;
@@ -84,14 +84,20 @@
 				else{
 					if(debug==true)
 						printf("target: %d %d", targetcellline, targetcellcol);
-					grapho=CaBgraph(matrix,lines,colummns,targetcellline,targetcellcol, fpout);
+					grapho=CaBgraph(matrix,lines,colummns,targetcellline,targetcellcol, fpout); /*generate graph*/
 					if(grapho!=NULL){
 						st = (int*)malloc(sizeof(int)*grapho->TotalVertex);
+						if(st==NULL)
+							exit(1);
 						wt = (double*)malloc(sizeof(double)*grapho->TotalVertex);
+						if(wt==NULL)
+							exit(1);
 						if(debug==true)
 							printgraph(grapho);
 						st=dijsktras(grapho,0,st,wt);
 						Wallnumber = (int*)malloc(sizeof(int));
+						if(Wallnumber==NULL)
+							exit(1);
 						Wallnumber[0]=0;
 						recurprint_spath(st,wt,grapho,fpout,1,Wallnumber);
 					}
@@ -104,13 +110,13 @@
 				if(grapho==NULL)
 					freematrix(matrix, lines, colummns);
 				if(grapho !=NULL){
-					 for (i = 0; i < (grapho->TotalVertex); i++){
+					 for (i = 0; i < (grapho->TotalVertex); i++){ /*free adjacency lists*/
         					for (aux = grapho->adjlist[i]; aux != NULL; aux = aux2){
             						aux2 = aux->next;
 							free(aux);
         					}
     					}
-					free(grapho->adjlist);
+					free(grapho->adjlist); /*free used blocks*/
 					free(grapho);
 					free(st);
 					free(wt);
@@ -119,15 +125,21 @@
 			}
 		}
 	if(brkFlag==false){
-		if(grapho==NULL)
+		if(grapho==NULL) /*free matrix in case there was no graph produce and consequently no matrix freeing*/
 			freematrix(matrix,lines,colummns);
 	}
-	fclose(fp);
+	fclose(fp); /*Ended reading close files and free ouput file name string*/
 	fclose(fpout);
 	free (_filenameout);
 
  }
-//08 Oct
+/*Function Name: gen_outname
+  Input: 1 string (input file name), 1 int (sflag to determine submission phase) [could have been a boolean]
+  Output: string
+  Date Created: 08 Oct 2021
+  Last Revised: 08 Oct 2021
+  Definition: Generates output file name
+*/
 char* gen_outname(char* _filenamein, int sflag){
 	int lenght=strlen(_filenamein);
 	char* _filenameout=(char*)malloc((sizeof(char)*lenght)+2);
@@ -147,7 +159,13 @@ char* gen_outname(char* _filenamein, int sflag){
         }
 	return _filenameout;
 }
-//08 Oct
+/*Function Name: check_inname
+  Input: 1 string (input file name), 1 int (sflag to determine submission phase) [could have been a boolean]
+  Output: No output. May exit program
+  Date Created: 08 Oct 2021
+  Last Revised: 08 Oct 2021
+  Definition: Checks if input extension is correct
+*/
 void check_inname(char* _filenamein,int sflag){
 	int lenght=strlen(_filenamein);
 	if(sflag==1){
@@ -159,33 +177,39 @@ void check_inname(char* _filenamein,int sflag){
                         help(Read_Error, Unsupported_Extension);
         }
 }
-
+/*Function Name: recurprint_spath
+  Input: Two pointer to integer (shortest path travessy and weight vectors), pointer to graph struct, File pointer, target/destination room ID (which is 1), vector for number of broken Walls [declared outside for initialization and to avoid a reset during recursion]
+  Output: pointer to pointer to int (matrix)
+  Date Created: 10 Nov 2021
+  Last Revised: 11 Nov 2021
+  Definition: Recursive print function for final phase file printing. This was needed since st[roomID1]=roomID2 from which roomID1 was reached
+*/
 void recurprint_spath(int* st,double* wt,graph *grapho, FILE* fpout, int target, int* Wallnumber){
         int brkLine=0,brkCol=0, cost=0;
 	node* aux=NULL;
-        if(st[1]==-1){
-                fprintf(fpout,"-1\n\n");
+        if(st[1]==-1){  /*if the target room was never visited*/
+                fprintf(fpout,"-1\n\n"); 
                 return;
         }
-	if(target!=0){
+	if(target!=0){ /*One wall per travessy between rooms, until he have reached the initial room*/
 		Wallnumber[0]++;
 	}
         if(target!=0){
-                recurprint_spath(st,wt,grapho,fpout,st[target],Wallnumber);
-	 	for (aux = grapho->adjlist[target]; aux != NULL; aux = aux->next){
+                recurprint_spath(st,wt,grapho,fpout,st[target],Wallnumber); /*Calls until we get to initial room*/
+	 	for (aux = grapho->adjlist[target]; aux != NULL; aux = aux->next){ /*find connection between room in graph*/
                                 if((aux->vertexID==st[target])){
-                                        brkLine=aux->brokenLine;
+                                        brkLine=aux->brokenLine; /*Get the connection coordinates and cost*/
                                         brkCol=aux->brokenCol;
 					cost=aux->edge_cost;
                                 }
                         }
-                fprintf(fpout,"%d %d %d \n",brkLine, brkCol, cost);
+                fprintf(fpout,"%d %d %d \n",brkLine, brkCol, cost); /*print them*/
 	}
 	if(target==0){
-		fprintf(fpout,"%d\n",(int)wt[1]);
-		fprintf(fpout,"%d\n",Wallnumber[0]);
+		fprintf(fpout,"%d\n",(int)wt[1]); /*Total cost is equal to the total cost to reach destination room, given in the weight vector*/
+		fprintf(fpout,"%d\n",Wallnumber[0]); /*Print nuber of Walls "demolished"*/
 	}
 	if(target==1)
-		fprintf(fpout,"\n");
+		fprintf(fpout,"\n");/*Add separation line  between solutions*/
                 
 }

@@ -12,12 +12,20 @@
 #include "roapgrops.h"
 #include "roapbops.h"
 #include "roapmatrix.h"
+
+/*Function Name: CaIoUnode (Create and Insert or Update node)
+  Input: 4 integers (data for node seeding- Vertex connected, edge_cost, broken wall coordinates)
+  Output: 
+  Date Created: 09 Nov 2021
+  Last Revised: 10 Nov 2021
+  Definition: Seed nodes in a adjacency list for graph building
+*/
 node* CaIoUnode (int vertexID, int edge_cost, int brokenCol, int brokenLine,  node* target){
 	node* new = target, *aux=NULL, *aux2=NULL;
 	bool eflag= false;
         if(target!= NULL){
-		if(target->next==NULL){
-			if((target->vertexID) == vertexID){
+		if(target->next==NULL){ /*If there is only one node*/
+			if((target->vertexID) == vertexID){ //find if adjacency is already in list
                                 eflag=true;
                                 aux=target;
                         }
@@ -33,7 +41,7 @@ node* CaIoUnode (int vertexID, int edge_cost, int brokenCol, int brokenLine,  no
 
 			}
 		}
-		if(eflag==false){
+		if(eflag==false){ /*ready new adjacency to be seeded*/
 			new = (node*)malloc(sizeof(node));
 			if(target->next==NULL)
 				target->next=new;
@@ -41,7 +49,7 @@ node* CaIoUnode (int vertexID, int edge_cost, int brokenCol, int brokenLine,  no
 				aux->next=new;
 		}
         }
-        else{ /*initialize node*/
+        else{ /*initialize list*/
 		if(eflag==false){
 			new = (node*)malloc(sizeof(node));
                 	new->vertexID = vertexID;
@@ -52,15 +60,15 @@ node* CaIoUnode (int vertexID, int edge_cost, int brokenCol, int brokenLine,  no
                		return new;
 		}
         }
-	if(eflag==false){
+	if(eflag==false){ /*Seed new adjacency*/
         	new->vertexID = vertexID;
         	new->next=NULL;
         	new->edge_cost=edge_cost;
 		new->brokenCol=brokenCol+1;
                 new->brokenLine=brokenLine+1;
 	}
-	else{
-		if((edge_cost < aux->edge_cost) || (edge_cost == aux->edge_cost)){
+	else{ /*Update existing adjacency*/
+		if((edge_cost < aux->edge_cost) || (edge_cost == aux->edge_cost)){ /*If new edge cost is cheaper or more recent (could have only been cheaper)*/
 			aux->edge_cost= edge_cost;
 			aux->brokenCol=brokenCol+1;
 			aux->brokenLine=brokenLine+1;
@@ -68,27 +76,33 @@ node* CaIoUnode (int vertexID, int edge_cost, int brokenCol, int brokenLine,  no
 	}
         return target;
 }
-
+/*Function Name: CaBgraph (Create and Build Graph)
+  Input: pointer to pointer to int (matrix), 4 integers (matrix lines and colummns and target coordinates), file pointer
+  Output: pointer to graph struct.
+  Date Created: 09 Nov 2021
+  Last Revised: 10 Nov 2021
+  Definition: 
+*/
 graph* CaBgraph(int **matrix, int lines, int colummns, int targetcellline, int targetcellcol, FILE* fpout){  /*Create and Build Graph*/
 	graph* grapho = NULL;
 	int i=0, j=0, colour =-4, vertex=0;
 	bool debug=false;
-	/*Start with flooding both start and end room, as they need to be fixed colours*/
-	targetcellline-=1;
+	targetcellline-=1;/*Update coordinates since the matrix starts at (0,0)*/
 	targetcellcol-=1;
 	if(debug==true)
 		printf("target: %d %d", targetcellline, targetcellcol);
-	 if(targetcellline<0 || targetcellline+1> lines || targetcellcol<0 || targetcellcol+1>colummns || matrix[targetcellline][targetcellcol] !=0){
-                fprintf(fpout,"-1\n\n"); //pass to file
+	 if(targetcellline<0 || targetcellline+1> lines || targetcellcol<0 || targetcellcol+1>colummns || matrix[targetcellline][targetcellcol] !=0){ /*check if treasure is out of bound or is non-white*/
+                fprintf(fpout,"-1\n\n"); /*pass to file*/
                 return grapho;
         }
+	 /*Start with flooding both start and end room, as they need to be fixed colours*/
 	Queuedflood_room(matrix, 0, 0,lines, colummns, start);
-	if(matrix[targetcellline][targetcellcol]==start){
-		fprintf(fpout,"0\n\n"); //pass to file
+	if(matrix[targetcellline][targetcellcol]==start){ /*check if they are in the same room*/
+		fprintf(fpout,"0\n\n"); /*pass to file*/
 		return grapho;
 	}
 	Queuedflood_room(matrix, targetcellline, targetcellcol,lines, colummns, end);
-	vertex=2;
+	vertex=2; /*every room is a vertex in the graph, 1(start)+1(end)=2*/
 	for (i=0; i< lines; i++){
 		for(j=0; j< colummns; j++){
 			if(matrix[i][j]==0){
@@ -100,7 +114,7 @@ graph* CaBgraph(int **matrix, int lines, int colummns, int targetcellline, int t
 			}
 		}
 	}
-	if(debug==true){
+	if(debug==true){ /*debug section for matrix printing*/
 		for (i=0; i< lines; i++){
                 	for(j=0; j< colummns; j++){
 				if(matrix[i][j]>=0)
@@ -110,20 +124,21 @@ graph* CaBgraph(int **matrix, int lines, int colummns, int targetcellline, int t
 			}
 			printf("\n");
 		}
-	}
+	}/*end of debug section*/
 	grapho = (graph*)malloc(sizeof(graph));
 	grapho->adjlist = (node**)calloc(1, (sizeof(node*) * (vertex))); /*alloc adjacency list array*/
 	grapho->TotalVertex=vertex;
 	for (i=0; i< lines; i++){
                 for(j=0; j< colummns; j++){
                         if(check_breakability(matrix,i,j,lines,colummns)==1){
-				if(j>0 && j < colummns-1){
+				if(j>0 && j < colummns-1){ /*check if the cell breakability is compromised by a horizontal bound [inhibts horizontal travel]*/
 					if((matrix[i][j-1]<-1 && matrix[i][j+1]<-1) && (matrix[i][j-1] != matrix[i][j+1])){
-						grapho->adjlist[-(matrix[i][j+1])-2] = CaIoUnode(-(matrix[i][j-1])-2,matrix[i][j],j,i,grapho->adjlist[-(matrix[i][j+1])-2]);
+						grapho->adjlist[-(matrix[i][j+1])-2] = CaIoUnode(-(matrix[i][j-1])-2,matrix[i][j],j,i,grapho->adjlist[-(matrix[i][j+1])-2]); /*The adjacency is made both-ways in */
+																					     /*in the adjacency lists [A-B and B-A]*/
                 				grapho->adjlist[-(matrix[i][j-1])-2] = CaIoUnode(-(matrix[i][j+1])-2,matrix[i][j],j,i,grapho->adjlist[-(matrix[i][j-1])-2]);
 					}
 				}
-				if(i>0 && i < lines-1){
+				if(i>0 && i < lines-1){  /*check if the cell breakability is compromised by a vertical bound [inhibts vertical travel]*/
 					if((matrix[i-1][j]<-1 && matrix[i+1][j]<-1)&& (matrix[i-1][j] != matrix[i+1][j])){
                                         	grapho->adjlist[-(matrix[i+1][j])-2] = CaIoUnode(-(matrix[i-1][j])-2,matrix[i][j],j,i,grapho->adjlist[-(matrix[i+1][j])-2]);
                                         	grapho->adjlist[-(matrix[i-1][j])-2] = CaIoUnode(-(matrix[i+1][j])-2,matrix[i][j],j,i,grapho->adjlist[-(matrix[i-1][j])-2]);
@@ -133,12 +148,19 @@ graph* CaBgraph(int **matrix, int lines, int colummns, int targetcellline, int t
 			}
                 }
 		if(i>0)
-			free(matrix[i-1]);
+			free(matrix[i-1]); /*Free previous line, a buffer is needed in order to be able to check vertical travel*/
         }
-	free(matrix[lines-1]);
+	free(matrix[lines-1]); /*free the remainder of matrix associated blocks, the last line and the matrix itself*/
 	free(matrix);
 	return grapho;
 }
+/*Function Name: printgraph
+  Input: pointer to graph struct, 
+  Output: None. Graph printed in stdout
+  Date Created: 08 Nov 2021
+  Last Revised: 10 Nov 2021
+  Definition: Print a given graph
+*/
 void printgraph(graph* grapho){
 	int i,r;
 	node *aux=NULL;

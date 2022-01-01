@@ -45,7 +45,15 @@ int variant_test(int** matrix, int targetcellline, int targetcellcol, int target
 			result=check_breakability(matrix, targetcellline, targetcellcol, lines, colummns);
 		break;
 		case '6':
-			result=flood_room(matrix,targetcellline,targetcellcol, targetcellline2, targetcellcol2, lines,colummns,path, 1, 0);
+			if(targetcellline < 0 ||targetcellline2 < 0 || targetcellline >(lines-1) || targetcellline2 > (lines-1) || targetcellcol < 0 ||targetcellcol2 < 0 || targetcellcol >(colummns-1) || targetcellcol2 > (colummns-1))
+                        result =-2;
+			else{
+				Queuedflood_room(matrix, targetcellline, targetcellcol,lines, colummns, path);
+					if(matrix[targetcellline2][targetcellcol2]==path)
+						result=1;
+					else
+						result=0;
+				}
 		break;
 	}
 	return result;
@@ -168,12 +176,11 @@ int* check_bounds(int targetcellline, int targetcellcol, int lines, int colummns
 	return bounds;
 }
 /*Function Name: flood_room
-  Input: 
+  Input: As indicated below (TMTA)
   Output: Integer
   Date Created: 12 Out 2021
   Last Revised: 16 Out 2021 (added flood prediction)
-  Definition: Flood-based algorithm to discover if two cells are in the same room
-  Based on: 
+  Definition: Flood-based algorithm to discover if two cells are in the same room. Unused in final phase for stack overflow from recursion
 */
 int flood_room(int** matrix, int targetcellline, int targetcellcol,int targetcellline2, int targetcellcol2, int lines, int colummns,int colour, bool firstflag, bool justfloodflag){
 	bool debug = false;
@@ -216,6 +223,14 @@ int flood_room(int** matrix, int targetcellline, int targetcellcol,int targetcel
 	}
 	return result;
 }
+
+/*Function Name: Queuedflood_room
+  Input: Pointer to pointer to integer (matrix), 2 ints (target coordinates), 2 ints (Total lines and colummns of matrix), 1 int (new colour of room)
+  Output: pointer to integer st, Althought it could also be a void function with no return.
+  Date Created: 11 Nov 2021
+  Last Revised: 11 Nov 2021
+  Definition: Flood room algorithm based on the above but iteration-driven with assistance from a queue
+*/
 void Queuedflood_room(int** matrix, int targetcellline, int targetcellcol,int lines, int colummns, int colour){
 	floodnode* last=NULL, *popped=NULL, *pushed=NULL, *nextpop=NULL;
 	last=(floodnode*)malloc(sizeof(floodnode));
@@ -225,21 +240,23 @@ void Queuedflood_room(int** matrix, int targetcellline, int targetcellcol,int li
 	last->next=NULL;
 	popped=last;
 	nextpop=last;
-	while(popped!=NULL){ /*effectively while the queue is not empty*/
+	while(nextpop!=NULL){ /*effectively while the queue is not empty*/
 			popped=nextpop;
-			if(popped==NULL)
+			if(popped==NULL)/*effectively if the queue empty*/
 				break;
-			matrix[(popped->line)][(popped->col)]=colour;
-			if((popped->line)< (lines-1) && (matrix[(popped->line)+1][popped->col] == white)){
-				matrix[(popped->line)+1][(popped->col)]=colour;
+			matrix[(popped->line)][(popped->col)]=colour; /*dyes cell*/
+			if((popped->line)< (lines-1) && (matrix[(popped->line)+1][popped->col] == white)){ 	/*checks if adjacent is in the matrix */
+														/*and if it is white (which also checks if it has been visited)*/
+				matrix[(popped->line)+1][(popped->col)]=colour; 
 				pushed=(floodnode*)malloc(sizeof(floodnode));
-				pushed->line=(popped->line)+1;
+				pushed->line=(popped->line)+1; /*add target coordinates to node*/
 				pushed->col=(popped->col);
 				pushed->next=NULL;
-				last->next=pushed;
-				last=pushed;
+				last->next=pushed; /*pushed node is linked to the last node in queue*/
+				last=pushed; /*Pushed node is now the last node on queue*/
 			} 
-                	
+                	/*Repeat for remaining cross adjacencies*/
+
                 	if((popped->col) < (colummns-1)  && (matrix[(popped->line)][(popped->col)+1] == white)){
 				matrix[(popped->line)][(popped->col)+1]=colour;
 				pushed=(floodnode*)malloc(sizeof(floodnode));
@@ -269,15 +286,15 @@ void Queuedflood_room(int** matrix, int targetcellline, int targetcellcol,int li
                         	last->next=pushed;
                         	last=pushed;
 			}
-		if(popped->next==NULL){
-			free(popped);
-			break;
+		if(popped->next==NULL){ /*check if it is the last element to be popped effectively if queue is empty*/
+			free(popped); /*pop node*/
+			break; /*return*/
 		}
 			
 		else
-			nextpop=popped->next;
+			nextpop=popped->next; /*the above element to the popped node is the next to be popped*/
 
-		free(popped);
+		free(popped); /*pop node*/
 	}
 
 }
