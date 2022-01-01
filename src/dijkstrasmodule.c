@@ -1,5 +1,5 @@
 /*-----------------------------------------------------------------------------------------------------+
-| dijkstrasmodule.c      |Final phase Dijkstras MST algorithm and queue based functions                |
+| dijkstrasmodule.c      |Final phase Dijkstras SPT algorithm and queue based functions                |
 |                        |module for roapmain.c                                                        |
 |                        |Mostly reskinned and edited code from AED-Powerpoints 10 and 13              |
 +------------------------------------------------------------------------------------------------------+
